@@ -1,0 +1,45 @@
+@page
+@model CanvasLMS.Pages.Courses.CreateModel
+
+        @{
+        ViewData["Title"] = "Create";
+        }
+        
+        <h1>Create</h1>
+        
+    <h4>Course</h4>
+    <hr />
+    <div class="row">
+    <div class="col-md-4">
+    <form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Course.Name" class="control-label"></label>
+                <input asp-for="Course.Name" class="form-control" />
+                <span asp-validation-for="Course.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Course.CreditHours" class="control-label"></label>
+                <input asp-for="Course.CreditHours" class="form-control" />
+                <span asp-validation-for="Course.CreditHours" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Course.FacultyId" class="control-label"></label>
+                <select asp-for="Course.FacultyId" class ="form-control" asp-items="ViewBag.FacultyId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Course.LecturerId" class="control-label"></label>
+                <select asp-for="Course.LecturerId" class ="form-control" asp-items="ViewBag.LecturerId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+

@@ -1,0 +1,49 @@
+@page
+@model CanvasLMS.Pages.CourseReviews.CreateModel
+
+        @{
+        ViewData["Title"] = "Create";
+        }
+        
+        <h1>Create</h1>
+        
+    <h4>CourseReview</h4>
+    <hr />
+    <div class="row">
+    <div class="col-md-4">
+    <form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CourseReview.CourseEnrollmentId" class="control-label"></label>
+                <select asp-for="CourseReview.CourseEnrollmentId" class ="form-control" asp-items="ViewBag.CourseEnrollmentId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="CourseReview.StudentId" class="control-label"></label>
+                <select asp-for="CourseReview.StudentId" class ="form-control" asp-items="ViewBag.StudentId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="CourseReview.Rating" class="control-label"></label>
+                <input asp-for="CourseReview.Rating" class="form-control" />
+                <span asp-validation-for="CourseReview.Rating" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CourseReview.Comment" class="control-label"></label>
+                <input asp-for="CourseReview.Comment" class="form-control" />
+                <span asp-validation-for="CourseReview.Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CourseReview.CreatedAt" class="control-label"></label>
+                <input asp-for="CourseReview.CreatedAt" class="form-control" />
+                <span asp-validation-for="CourseReview.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+

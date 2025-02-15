@@ -1,0 +1,57 @@
+@page
+@model CanvasLMS.Pages.Invoices.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Invoice</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Invoice.Id" />
+            <div class="form-group">
+                
+                <label asp-for="Invoice.CourseEnrollmentId" class="control-label"></label>
+                <select asp-for="Invoice.CourseEnrollmentId" class="form-control" asp-items="ViewBag.CourseEnrollmentId"></select>
+                <span asp-validation-for="Invoice.CourseEnrollmentId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Invoice.PaymentId" class="control-label"></label>
+                <input asp-for="Invoice.PaymentId" class="form-control" />
+                <span asp-validation-for="Invoice.PaymentId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Invoice.Amount" class="control-label"></label>
+                <input asp-for="Invoice.Amount" class="form-control" />
+                <span asp-validation-for="Invoice.Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Invoice.CreatedAt" class="control-label"></label>
+                <input asp-for="Invoice.CreatedAt" class="form-control" />
+                <span asp-validation-for="Invoice.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Invoice.Status" class="control-label"></label>
+                <select asp-for="Invoice.Status" class="form-control"></select>
+                <span asp-validation-for="Invoice.Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+

@@ -1,0 +1,49 @@
+@page
+@model CanvasLMS.Pages.CourseEnrollments.CreateModel
+
+        @{
+        ViewData["Title"] = "Create";
+        }
+        
+        <h1>Create</h1>
+        
+    <h4>CourseEnrollment</h4>
+    <hr />
+    <div class="row">
+    <div class="col-md-4">
+    <form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CourseEnrollment.SemesterCourseId" class="control-label"></label>
+                <select asp-for="CourseEnrollment.SemesterCourseId" class ="form-control" asp-items="ViewBag.SemesterCourseId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="CourseEnrollment.StudentId" class="control-label"></label>
+                <select asp-for="CourseEnrollment.StudentId" class ="form-control" asp-items="ViewBag.StudentId"></select>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="CourseEnrollment.Approved" /> @Html.DisplayNameFor(model => model.CourseEnrollment.Approved)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="CourseEnrollment.Approval" class="control-label"></label>
+                <select asp-for="CourseEnrollment.Approval" class="form-control"></select>
+                <span asp-validation-for="CourseEnrollment.Approval" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CourseEnrollment.Status" class="control-label"></label>
+                <select asp-for="CourseEnrollment.Status" class="form-control"></select>
+                <span asp-validation-for="CourseEnrollment.Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+

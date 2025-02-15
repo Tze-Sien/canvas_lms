@@ -1,0 +1,54 @@
+@page
+@model CanvasLMS.Pages.StudentTranscripts.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.StudentTranscript[0].Student)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StudentTranscript[0].CourseEnrollment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StudentTranscript[0].CreditHours)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StudentTranscript[0].CreatedAt)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.StudentTranscript) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Student.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CourseEnrollment.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreditHours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
