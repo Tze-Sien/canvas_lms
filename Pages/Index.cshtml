@@ -2,9 +2,27 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
+
+    var linkList = new List<(string title, string url, string ImageUrl)>
+{
+("Manage User", "/Students/Create", "https://via.placeholder.com/100"),
+("Manage Faculties", "/Faculties/Create", "https://via.placeholder.com/100"),
+("Manage Semester", "/Semesters/Create", "https://via.placeholder.com/100"),
+("Manage Payments", "/Payments/Create", "https://via.placeholder.com/100"),
+("Manage Courses", "/Courses/Create", "https://via.placeholder.com/100"),
+@* ("Create User", "/Students/Create", "https://via.placeholder.com/100"), *@
+};
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1>Welcome back</h1>
+<h2>@DateTime.Now.ToString("h:mmtt")</h2>
+<div style="margin: 20px;"></div>
+<div class="index-container">
+    @foreach (var item in linkList)
+    {
+
+        <a class="index-content" asp-area="" asp-page=@item.url>@item.title</a>
+
+    }
+
 </div>
