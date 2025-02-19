@@ -12,15 +12,16 @@ namespace CanvasLMS.Pages.CourseReviews
 {
     public class DeleteModel : PageModel
     {
-        private readonly CanvasLMS.Services.ApplicationDBContext _context;
+        private readonly ApplicationDBContext _context;
 
-        public DeleteModel(CanvasLMS.Services.ApplicationDBContext context)
+        public DeleteModel(ApplicationDBContext context)
         {
             _context = context;
         }
 
         [BindProperty]
         public CourseReview CourseReview { get; set; } = default!;
+        public Course Course { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(Guid? id)
         {
@@ -29,34 +30,89 @@ namespace CanvasLMS.Pages.CourseReviews
                 return NotFound();
             }
 
-            var coursereview = await _context.CourseReviews.FirstOrDefaultAsync(m => m.Id == id);
-
-            if (coursereview is not null)
+            var currentUserId = User?.Identity?.Name;
+            if (string.IsNullOrEmpty(currentUserId))
             {
-                CourseReview = coursereview;
-
-                return Page();
+                return RedirectToPage("/Login/Index");
             }
 
-            return NotFound();
+            // Get active semesters
+            var activeSemesters = await _context.Semesters
+                .Where(s => s.Status == SemesterStatus.Ongoing)
+                .ToListAsync();
+
+            if (!activeSemesters.Any())
+            {
+                return RedirectToPage("./Index");
+            }
+
+            var semesterIds = activeSemesters.Select(s => s.Id).ToList();
+
+            // Get the review with all required navigation properties
+            var review = await _context.CourseReviews
+                .Include(cr => cr.CourseEnrollment!)
+                    .ThenInclude(ce => ce.SemesterCourse!)
+                        .ThenInclude(sc => sc.Course)
+                .Include(cr => cr.Student!)
+                    .ThenInclude(s => s!.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            // Verify this review is for a course in an active semester
+            if (!semesterIds.Contains(review!.CourseEnrollment!.SemesterCourse!.SemesterId))
+            {
+                return RedirectToPage("./Index");
+            }
+
+            CourseReview = review;
+            Course = review.CourseEnrollment.SemesterCourse.Course!;
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(Guid? id)
         {
             if (id == null)
             {
-                return NotFound();
+                // return NotFound();
             }
 
-            var coursereview = await _context.CourseReviews.FindAsync(id);
-            if (coursereview != null)
+            var currentUserId = User?.Identity?.Name;
+            if (string.IsNullOrEmpty(currentUserId))
             {
-                CourseReview = coursereview;
-                _context.CourseReviews.Remove(CourseReview);
-                await _context.SaveChangesAsync();
+                return RedirectToPage("/Login/Index");
             }
 
-            return RedirectToPage("./Index");
+            // Get active semesters
+            var activeSemesters = await _context.Semesters
+                .Where(s => s.Status == SemesterStatus.Ongoing)
+                .ToListAsync();
+
+            if (!activeSemesters.Any())
+            {
+                return RedirectToPage("./Index");
+            }
+
+            var semesterIds = activeSemesters.Select(s => s.Id).ToList();
+
+            // Get the review with required navigation properties
+            var review = await _context.CourseReviews
+                .Include(cr => cr.CourseEnrollment!)
+                    .ThenInclude(ce => ce.SemesterCourse!)
+                .Include(cr => cr.Student!)
+                    .ThenInclude(s => s!.User)
+                .FirstOrDefaultAsync(cr => cr.Id == id);
+
+            // Verify active semester
+            if (!semesterIds.Contains(review!.CourseEnrollment!.SemesterCourse!.SemesterId))
+            {
+                return RedirectToPage("./Index");
+            }
+
+            var courseId = review.CourseEnrollment.SemesterCourse.CourseId;
+            _context.CourseReviews.Remove(review);
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Index", new { selectedCourseId = courseId });
         }
     }
 }

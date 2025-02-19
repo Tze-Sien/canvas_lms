@@ -21,19 +21,40 @@ namespace CanvasLMS.Pages.SemesterCourses
 
         public IActionResult OnGet()
         {
-        ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Name");
-        ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name");
+            PopulateDropDowns();
             return Page();
         }
 
         [BindProperty]
         public SemesterCourse SemesterCourse { get; set; } = default!;
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
+        private void PopulateDropDowns()
+        {
+            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Name");
+            ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name");
+        }
+
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                PopulateDropDowns();
+                return Page();
+            }
+
+
+            // Additional validation
+            if (SemesterCourse.SemesterId == Guid.Empty)
+            {
+                ModelState.AddModelError("SemesterCourse.SemesterId", "Please select a semester");
+                PopulateDropDowns();
+                return Page();
+            }
+
+            if (SemesterCourse.CourseId == Guid.Empty)
+            {
+                ModelState.AddModelError("SemesterCourse.CourseId", "Please select a course");
+                PopulateDropDowns();
                 return Page();
             }
 

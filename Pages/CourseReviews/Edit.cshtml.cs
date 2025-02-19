@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CanvasLMS.Models;
 using CanvasLMS.Services;
@@ -13,15 +12,16 @@ namespace CanvasLMS.Pages.CourseReviews
 {
     public class EditModel : PageModel
     {
-        private readonly CanvasLMS.Services.ApplicationDBContext _context;
+        private readonly ApplicationDBContext _context;
 
-        public EditModel(CanvasLMS.Services.ApplicationDBContext context)
+        public EditModel(ApplicationDBContext context)
         {
             _context = context;
         }
 
         [BindProperty]
         public CourseReview CourseReview { get; set; } = default!;
+        public Course Course { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(Guid? id)
         {
@@ -30,27 +30,94 @@ namespace CanvasLMS.Pages.CourseReviews
                 return NotFound();
             }
 
-            var coursereview =  await _context.CourseReviews.FirstOrDefaultAsync(m => m.Id == id);
-            if (coursereview == null)
+            var currentUserId = User?.Identity?.Name;
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return RedirectToPage("/Login/Index");
+            }
+
+            // Get active semesters
+            var activeSemesters = await _context.Semesters
+                .Where(s => s.Status == SemesterStatus.Ongoing)
+                .ToListAsync();
+
+            if (!activeSemesters.Any())
+            {
+                return RedirectToPage("./Index");
+            }
+
+            var semesterIds = activeSemesters.Select(s => s.Id).ToList();
+
+            // Get the review with all required navigation properties
+            var review = await _context.CourseReviews
+                .Include(cr => cr.CourseEnrollment!)
+                    .ThenInclude(ce => ce.SemesterCourse!)
+                        .ThenInclude(sc => sc.Course)
+                .Include(cr => cr.Student!)
+                    .ThenInclude(s => s!.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (review == null)
             {
                 return NotFound();
             }
-            CourseReview = coursereview;
-           ViewData["CourseEnrollmentId"] = new SelectList(_context.CourseEnrollments, "Id", "Id");
-           ViewData["StudentId"] = new SelectList(_context.Students, "Id", "Id");
+
+            // Verify this review is for a course in an active semester
+            if (!semesterIds.Contains(review.CourseEnrollment!.SemesterCourse!.SemesterId))
+            {
+                return RedirectToPage("./Index");
+            }
+
+            CourseReview = review;
+            Course = review.CourseEnrollment.SemesterCourse.Course!;
+
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            var currentUserId = User?.Identity?.Name;
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return RedirectToPage("/Login/Index");
+            }
+
+            // Get active semesters
+            var activeSemesters = await _context.Semesters
+                .Where(s => s.Status == SemesterStatus.Ongoing)
+                .ToListAsync();
+
+            if (!activeSemesters.Any())
+            {
+                return RedirectToPage("./Index");
+            }
+
+            var semesterIds = activeSemesters.Select(s => s.Id).ToList();
+
+            // Get the existing review
+            var existingReview = await _context.CourseReviews
+                .Include(cr => cr.CourseEnrollment!)
+                    .ThenInclude(ce => ce.SemesterCourse!)
+                .Include(cr => cr.Student!)
+                    .ThenInclude(s => s!.User)
+                .FirstOrDefaultAsync(cr => cr.Id == CourseReview.Id);
+
+
+
+            // Verify active semester
+            if (!semesterIds.Contains(existingReview.CourseEnrollment!.SemesterCourse!.SemesterId))
+            {
+                return RedirectToPage("./Index");
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            _context.Attach(CourseReview).State = EntityState.Modified;
+            // Update only the rating and comment
+            existingReview.Rating = CourseReview.Rating;
+            existingReview.Comment = CourseReview.Comment;
 
             try
             {
@@ -62,13 +129,10 @@ namespace CanvasLMS.Pages.CourseReviews
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Index", new { selectedCourseId = existingReview.CourseEnrollment.SemesterCourse.CourseId });
         }
 
         private bool CourseReviewExists(Guid id)

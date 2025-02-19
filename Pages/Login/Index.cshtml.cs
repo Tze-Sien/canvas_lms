@@ -29,28 +29,6 @@ namespace CanvasLMS.Pages.Login
 
         public async Task<IActionResult> OnPostAsync()
         {
-
-            if(Email == "admin" && Password == "password") {
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Email, Email),
-                    new Claim(ClaimTypes.Name, "Admin") 
-                };
-
-                var identity = new ClaimsIdentity(claims, "CookieAuth");
-                var principal = new ClaimsPrincipal(identity);
-
-                await HttpContext.SignInAsync("CookieAuth", principal);
-
-                // If ReturnUrl is provided and safe, redirect there; otherwise, go to Index
-                if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
-                {
-                    return LocalRedirect(ReturnUrl);
-                }
-                return RedirectToPage("/Index");
-            }
-
-
             // Find user by email
             User? user = await _context.Users.FirstOrDefaultAsync(u => u.Email == Email);
 
@@ -59,8 +37,9 @@ namespace CanvasLMS.Pages.Login
             {
                 var claims = new List<Claim>
                 {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Email, Email),
-                    new Claim(ClaimTypes.Name, user.Name) 
+                    new Claim(ClaimTypes.Name, user.Name), 
                 };
 
                 var identity = new ClaimsIdentity(claims, "CookieAuth");

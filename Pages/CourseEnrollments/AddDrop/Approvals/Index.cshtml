@@ -1,0 +1,103 @@
+@page
+@using CanvasLMS.Models
+@model CanvasLMS.Pages.CourseEnrollments.AddDrop.ApprovalModel
+@{
+    ViewData["Title"] = "Add/Drop Requests";
+}
+
+<h1>Add/Drop Request Approval</h1>
+
+<div class="container">
+    @if (!Model.PendingRequests.Any())
+    {
+        <div class="alert alert-info">
+            No pending add/drop requests.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Semester</th>
+                        <th>Request Type</th>
+                        <th>Requested At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var request in Model.PendingRequests)
+                    {
+                        <tr>
+                            <td>@request.Student?.User?.Name</td>
+                            <td>@request.Course?.Name</td>
+                            <td>@request.Semester?.Name</td>
+                            <td>@request.Action</td>
+                            <td>@request.RequestedAt.ToString("g")</td>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#approvalModal@(request.Id)">
+                                    Take Action
+                                </button>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="approvalModal@(request.Id)" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form method="post">
+                                                <input type="hidden" asp-for="RequestId" value="@request.Id" />
+                                                
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Request Details</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <p><strong>Student:</strong> @request.Student?.User?.Name</p>
+                                                        <p><strong>Course:</strong> @request.Course?.Name</p>
+                                                        <p><strong>Request Type:</strong> @request.Action</p>
+                                                        <p><strong>Requested At:</strong> @request.RequestedAt.ToString("g")</p>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Action</label>
+                                                        <select class="form-select" asp-for="Action">
+                                                            <option value="@AddDropApproval.Approved">Approve</option>
+                                                            <option value="@AddDropApproval.Rejected">Reject</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Comment</label>
+                                                        <textarea class="form-control" asp-for="Comment" rows="3" 
+                                                                  placeholder="Required for rejection"></textarea>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

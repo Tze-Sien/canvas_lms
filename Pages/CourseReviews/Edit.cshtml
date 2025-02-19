@@ -2,56 +2,61 @@
 @model CanvasLMS.Pages.CourseReviews.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Course Review";
 }
 
-<h1>Edit</h1>
+<h1>Edit Course Review</h1>
 
-<h4>CourseReview</h4>
+<h4>@Model.Course.Name</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="CourseReview.Id" />
-            <div class="form-group">
-                
-                <label asp-for="CourseReview.CourseEnrollmentId" class="control-label"></label>
-                <select asp-for="CourseReview.CourseEnrollmentId" class="form-control" asp-items="ViewBag.CourseEnrollmentId"></select>
-                <span asp-validation-for="CourseReview.CourseEnrollmentId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                
-                <label asp-for="CourseReview.StudentId" class="control-label"></label>
-                <select asp-for="CourseReview.StudentId" class="form-control" asp-items="ViewBag.StudentId"></select>
-                <span asp-validation-for="CourseReview.StudentId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                
-                <label asp-for="CourseReview.Rating" class="control-label"></label>
-                <input asp-for="CourseReview.Rating" class="form-control" />
+            <input type="hidden" asp-for="CourseReview.CourseEnrollmentId" />
+            <input type="hidden" asp-for="CourseReview.StudentId" />
+            <input type="hidden" asp-for="CourseReview.CreatedAt" />
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="CourseReview.Rating" class="control-label">Rating (1-5 stars)</label>
+                <div>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="CourseReview.Rating" 
+                                   id="rating@(i)" value="@i" required />
+                            <label class="form-check-label" for="rating@(i)">
+                                @for (int j = 0; j < i; j++)
+                                {
+                                    <span class="text-warning">★</span>
+                                }
+                                @for (int j = i; j < 5; j++)
+                                {
+                                    <span class="text-muted">☆</span>
+                                }
+                            </label>
+                        </div>
+                    }
+                </div>
                 <span asp-validation-for="CourseReview.Rating" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                
-                <label asp-for="CourseReview.Comment" class="control-label"></label>
-                <input asp-for="CourseReview.Comment" class="form-control" />
+            
+            <div class="form-group mb-3">
+                <label asp-for="CourseReview.Comment" class="control-label">Your Review</label>
+                <textarea asp-for="CourseReview.Comment" class="form-control" rows="4"></textarea>
                 <span asp-validation-for="CourseReview.Comment" class="text-danger"></span>
             </div>
+            
             <div class="form-group">
-                
-                <label asp-for="CourseReview.CreatedAt" class="control-label"></label>
-                <input asp-for="CourseReview.CreatedAt" class="form-control" />
-                <span asp-validation-for="CourseReview.CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a asp-page="Index" asp-route-selectedCourseId="@Model.Course.Id" class="btn btn-secondary">Back to Reviews</a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-page="./Index">Back to List</a>
-</div>
-
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

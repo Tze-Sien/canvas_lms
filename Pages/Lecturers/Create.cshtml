@@ -1,27 +1,33 @@
 @page
 @model CanvasLMS.Pages.Lecturers.CreateModel
 
-        @{
-        ViewData["Title"] = "Create";
-        }
-        
-        <h1>Create</h1>
-        
-    <h4>Lecturer</h4>
-    <hr />
-    <div class="row">
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Lecturer</h4>
+<hr />
+<div class="row">
     <div class="col-md-4">
-    <form method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Lecturer.FacultyId" class="control-label"></label>
-                <select asp-for="Lecturer.FacultyId" class ="form-control" asp-items="ViewBag.FacultyId"></select>
+                <label asp-for="Lecturer.FacultyId" class="control-label">Faculty</label>
+                <select asp-for="Lecturer.FacultyId" class="form-control" asp-items="ViewBag.FacultyId">
+                    <option value="">-- Select Faculty --</option>
+                </select>
+                <span asp-validation-for="Lecturer.FacultyId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Lecturer.UserId" class="control-label"></label>
-                <select asp-for="Lecturer.UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
+                <label asp-for="Lecturer.UserId" class="control-label">User</label>
+                <select asp-for="Lecturer.UserId" class="form-control" asp-items="ViewBag.UserId">
+                    <option value="">-- Select User --</option>
+                </select>
+                <span asp-validation-for="Lecturer.UserId" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
@@ -32,3 +38,6 @@
     <a asp-page="Index">Back to List</a>
 </div>
 
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

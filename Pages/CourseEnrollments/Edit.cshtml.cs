@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CanvasLMS.Models;
-using CanvasLMS.Services;
 
 namespace CanvasLMS.Pages.CourseEnrollments
 {
@@ -30,23 +25,61 @@ namespace CanvasLMS.Pages.CourseEnrollments
                 return NotFound();
             }
 
-            var courseenrollment =  await _context.CourseEnrollments.FirstOrDefaultAsync(m => m.Id == id);
+            var courseenrollment = await _context.CourseEnrollments
+                .Include(c => c.SemesterCourse)
+                    .ThenInclude(sc => sc!.Course)
+                .Include(c => c.Student)
+                    .ThenInclude(s => s!.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
+                
             if (courseenrollment == null)
             {
                 return NotFound();
             }
             CourseEnrollment = courseenrollment;
-           ViewData["SemesterCourseId"] = new SelectList(_context.SemesterCourses, "Id", "Id");
-           ViewData["StudentId"] = new SelectList(_context.Students, "Id", "Id");
+
+            ViewData["SemesterCourseId"] = new SelectList(_context.SemesterCourses
+                .Include(sc => sc.Course)
+                .Select(sc => new { sc.Id, DisplayName = sc.Course!.Name }), 
+                "Id", "DisplayName");
+
+            ViewData["StudentId"] = new SelectList(_context.Students
+                .Include(s => s.User)
+                .Select(s => new { s.Id, DisplayName = s.User!.Name }), 
+                "Id", "DisplayName");
+
+            ViewData["ApprovalOptions"] = new SelectList(
+                Enum.GetValues(typeof(AddDropApproval))
+                    .Cast<AddDropApproval>()
+                    .Select(e => new { Id = e, Name = e.ToString() }),
+                "Id",
+                "Name");
+
+            ViewData["StatusOptions"] = new SelectList(
+                Enum.GetValues(typeof(EnrollmentStatus))
+                    .Cast<EnrollmentStatus>()
+                    .Select(e => new { Id = e, Name = e.ToString() }),
+                "Id",
+                "Name");
+
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+
+                // Display the error message
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                    }
+                }
+                
+
                 return Page();
             }
 

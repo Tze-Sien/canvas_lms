@@ -1,0 +1,48 @@
+.table-row-animation {
+    transition: all 0.3s ease-in-out;
+}
+
+.table-row-animation.fade-out {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.table-row-animation.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.empty-state-animation {
+    transition: all 0.3s ease-in-out;
+}
+
+/* SweetAlert2 Custom Styles */
+.swal2-popup {
+    border-radius: 0.5rem;
+}
+
+.swal2-title {
+    font-size: 1.4rem !important;
+}
+
+.swal2-html-container {
+    font-size: 1rem !important;
+}
+
+.swal2-confirm {
+    padding: 0.5rem 1.5rem !important;
+}
+
+.swal2-cancel {
+    padding: 0.5rem 1.5rem !important;
+}

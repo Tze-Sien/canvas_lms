@@ -2,27 +2,42 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
-
-    var linkList = new List<(string title, string url, string ImageUrl)>
-{
-("Manage User", "/Students/Create", "https://via.placeholder.com/100"),
-("Manage Faculties", "/Faculties/Create", "https://via.placeholder.com/100"),
-("Manage Semester", "/Semesters/Create", "https://via.placeholder.com/100"),
-("Manage Payments", "/Payments/Create", "https://via.placeholder.com/100"),
-("Manage Courses", "/Courses/Create", "https://via.placeholder.com/100"),
-@* ("Create User", "/Students/Create", "https://via.placeholder.com/100"), *@
-};
 }
 
-<h1>Welcome back</h1>
-<h2>@DateTime.Now.ToString("h:mmtt")</h2>
-<div style="margin: 20px;"></div>
-<div class="index-container">
-    @foreach (var item in linkList)
-    {
-
-            <a class="index-content" asp-area="" asp-page=@item.url>@item.title</a>
-
-    }
-
+<div class="welcome-section mt-5">
+    <div class="welcome-header">
+        <i class="fas fa-user-circle"></i>
+        <div class="welcome-text">
+            <h1>Welcome back, @Model.UserName</h1>
+            <p class="current-time"><i class="far fa-clock"></i> @DateTime.Now.ToString("h:mm tt")</p>
+        </div>
+    </div>
 </div>
+
+<div class="dashboard-container">
+    @foreach (var item in Model.NavigationLinks)
+    {
+        <a class="dashboard-card" asp-area="" asp-page="@item.url">
+            <i class="@GetIconClass(item.title)"></i>
+            <span>@item.title</span>
+        </a>
+    }
+</div>
+
+@functions {
+    private string GetIconClass(string title)
+    {
+        return title.ToLower() switch
+        {
+            var t when t.Contains("course") => "fas fa-book",
+            var t when t.Contains("student") => "fas fa-user-graduate",
+            var t when t.Contains("lecturer") => "fas fa-chalkboard-teacher",
+            var t when t.Contains("faculty") => "fas fa-university",
+            var t when t.Contains("payment") || t.Contains("invoice") => "fas fa-receipt",
+            var t when t.Contains("semester") => "fas fa-calendar-alt",
+            var t when t.Contains("review") => "fas fa-star",
+            var t when t.Contains("contact") => "fas fa-envelope",
+            _ => "fas fa-link"
+        };
+    }
+}

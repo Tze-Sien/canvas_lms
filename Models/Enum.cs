@@ -1,5 +1,16 @@
 namespace CanvasLMS.Models 
 {
+    public enum DayOfWeek
+    {
+        Monday,
+        Tuesday,
+        Wednesday,
+        Thursday,
+        Friday,
+        Saturday,
+        Sunday
+    }
+
      public enum Role
     {
         Student,
@@ -40,5 +51,13 @@ namespace CanvasLMS.Models
         Paid,
         Pending,
         Void
+    }
+
+    public enum SemesterStatus
+    {
+        Draft,
+        OpenForEnrollment,
+        Ongoing,
+        Completed
     }
 }

@@ -28,12 +28,14 @@ namespace CanvasLMS.Pages.Lecturers
                 return NotFound();
             }
 
-            var lecturer = await _context.Lecturers.FirstOrDefaultAsync(m => m.Id == id);
+            var lecturer = await _context.Lecturers
+                .Include(l => l.Faculty)
+                .Include(l => l.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (lecturer is not null)
             {
                 Lecturer = lecturer;
-
                 return Page();
             }
 

@@ -2,42 +2,51 @@
 @model CanvasLMS.Pages.StudentTranscripts.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Transcript Details";
 }
 
-<h1>Details</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Transcript Details</h1>
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
 
-<div>
-    <h4>StudentTranscript</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentTranscript.Student)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.StudentTranscript.Student.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentTranscript.CourseEnrollment)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.StudentTranscript.CourseEnrollment.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentTranscript.CreditHours)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.StudentTranscript.CreditHours)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentTranscript.CreatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.StudentTranscript.CreatedAt)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.StudentTranscript.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-4">Student Information</h5>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p class="mb-2">
+                        <span class="text-muted">Student Name:</span>
+                        <span class="ms-2">@Model.StudentTranscript.Student.User.Name</span>
+                    </p>
+                    <p class="mb-0">
+                        <span class="text-muted">Credit Hours:</span>
+                        <span class="ms-2">@Model.StudentTranscript.CreditHours</span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-2">
+                        <span class="text-muted">Course:</span>
+                        <span class="ms-2">@Model.StudentTranscript.CourseEnrollment.SemesterCourse.Course.Name</span>
+                    </p>
+                    <p class="mb-0">
+                        <span class="text-muted">Created Date:</span>
+                        <span class="ms-2">@Model.StudentTranscript.CreatedAt.ToString("MMMM d, yyyy")</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a asp-page="./Edit" asp-route-id="@Model.StudentTranscript.Id" class="btn btn-primary">
+                    <i class="bi bi-pencil me-2"></i>Edit
+                </a>
+                <a asp-page="./Delete" asp-route-id="@Model.StudentTranscript.Id" class="btn btn-danger">
+                    <i class="bi bi-trash me-2"></i>Delete
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

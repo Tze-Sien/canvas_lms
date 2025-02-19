@@ -1,0 +1,99 @@
+@page
+@model CanvasLMS.Pages.StudentStatement.IndexModel
+@{
+    ViewData["Title"] = "Student Statement";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="border-bottom pb-3">Student Statement</h1>
+            <p class="text-muted lead">Academic overview and course enrollment details</p>
+        </div>
+    </div>
+
+    @if (Model.Student?.User != null)
+    {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-white border-bottom">
+                <h2 class="h4 mb-0 text-primary">Student Profile</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column gap-2">
+                            <div>
+                                <label class="text-muted small mb-1">Full Name</label>
+                                <p class="h5 mb-0">@Model.Student.User.Name</p>
+                            </div>
+                            <div>
+                                <label class="text-muted small mb-1">Email Address</label>
+                                <p class="h5 mb-0">@Model.Student.User.Email</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column gap-2">
+                            <div>
+                                <label class="text-muted small mb-1">Faculty</label>
+                                <p class="h5 mb-0">@Model.Student.Faculty?.Name</p>
+                            </div>
+                            <div>
+                                <label class="text-muted small mb-1">Total Credit Hours</label>
+                                <p class="h5 mb-0">@Model.TotalCreditHours</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @foreach (var semesterGroup in Model.SemesterGroups)
+        {
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header border-bottom bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0 text-primary">@semesterGroup.Semester.Name</h3>
+                        <span class="badge bg-primary px-3 py-2">@semesterGroup.SemesterCreditHours Credit Hours</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="px-4">Course</th>
+                                    <th>Credit Hours</th>
+                                    <th>Schedule</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var enrollment in semesterGroup.Enrollments)
+                                {
+                                    <tr>
+                                        <td class="px-4">@enrollment.Course.Name</td>
+                                        <td>@enrollment.Course.CreditHours</td>
+                                        <td>
+                                            <span class="text-nowrap">
+                                                @enrollment.SemesterCourse.Day.ToString()
+                                                @enrollment.SemesterCourse.StartTime.ToString(@"hh\:mm") - 
+                                                @enrollment.SemesterCourse.EndTime.ToString(@"hh\:mm")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-warning shadow-sm">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            No student information found. Please log in as a student to view your statement.
+        </div>
+    }
+</div>

@@ -28,7 +28,9 @@ namespace CanvasLMS.Pages.Semesters
                 return NotFound();
             }
 
-            var semester = await _context.Semesters.FirstOrDefaultAsync(m => m.Id == id);
+            var semester = await _context.Semesters
+                .Include(s => s.Faculty)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (semester is not null)
             {

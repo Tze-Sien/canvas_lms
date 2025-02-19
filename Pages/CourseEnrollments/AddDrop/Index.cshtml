@@ -1,0 +1,205 @@
+@page
+@model CanvasLMS.Pages.CourseEnrollments.AddDrop.IndexModel
+@{
+    ViewData["Title"] = "Add/Drop Courses";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Add/Drop Courses</h2>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-journal-plus me-2"></i>
+                        Available Courses
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.AvailableCourses.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-calendar-x h1 text-muted"></i>
+                            <p class="text-muted mt-2">No courses available for enrollment at this time.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Credit Hours</th>
+                                        <th>Lecturer</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var semesterCourse in Model.AvailableCourses.Where(ac => 
+                                        !Model.CurrentEnrollments.Any(ce => 
+                                            ce.SemesterCourseId == ac.Id && 
+                                            ce.Status == CanvasLMS.Models.EnrollmentStatus.Enrolled && 
+                                            ce.Approval == CanvasLMS.Models.AddDropApproval.Approved)))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@(semesterCourse.Course?.Name ?? "N/A")</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@(semesterCourse.Course?.CreditHours ?? 0) Credits</span>
+                                            </td>
+                                            <td>@(semesterCourse.Course?.Lecturer?.User?.Name ?? "TBD")</td>
+                                            <td class="text-end">
+                                                <form method="post" asp-page-handler="Enroll" asp-route-semesterCourseId="@semesterCourse.Id" class="d-inline">
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        <i class="bi bi-plus-circle me-1"></i> Add Course
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Pending Approval Requests
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.CurrentEnrollments.Any(e => e.Approval == CanvasLMS.Models.AddDropApproval.Pending))
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-check-circle h1 text-muted"></i>
+                            <p class="text-muted mt-2">No pending approval requests.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Credit Hours</th>
+                                        <th>Request Type</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var enrollment in Model.CurrentEnrollments.Where(e => e.Approval == CanvasLMS.Models.AddDropApproval.Pending))
+                                    {
+                                        <tr>
+                                            <td><strong>@(enrollment.SemesterCourse?.Course?.Name ?? "N/A")</strong></td>
+                                            <td>
+                                                <span class="badge bg-info">@(enrollment.SemesterCourse?.Course?.CreditHours ?? 0) Credits</span>
+                                            </td>
+                                            <td>
+                                                @if (enrollment.Status == CanvasLMS.Models.EnrollmentStatus.Enrolled)
+                                                {
+                                                    <span class="badge bg-primary"><i class="bi bi-plus-circle me-1"></i> Add Request</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning"><i class="bi bi-dash-circle me-1"></i> Drop Request</span>
+                                                }
+                                            </td>
+                                            <td><span class="badge bg-warning"><i class="bi bi-hourglass-split me-1"></i> Pending</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-journal-check me-2"></i>
+                        Current Semester Enrollments
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.CurrentEnrollments.Any(e => e.Status == CanvasLMS.Models.EnrollmentStatus.Enrolled && 
+                                                          e.Approval == CanvasLMS.Models.AddDropApproval.Approved))
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-journal-x h1 text-muted"></i>
+                            <p class="text-muted mt-2">You are not enrolled in any courses this semester.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Credit Hours</th>
+                                        <th>Lecturer</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var enrollment in Model.CurrentEnrollments.Where(e => 
+                                        e.Status == CanvasLMS.Models.EnrollmentStatus.Enrolled && 
+                                        e.Approval == CanvasLMS.Models.AddDropApproval.Approved))
+                                    {
+                                        <tr>
+                                            <td><strong>@(enrollment.SemesterCourse?.Course?.Name ?? "N/A")</strong></td>
+                                            <td>
+                                                <span class="badge bg-info">@(enrollment.SemesterCourse?.Course?.CreditHours ?? 0) Credits</span>
+                                            </td>
+                                            <td>@(enrollment.SemesterCourse?.Course?.Lecturer?.User?.Name ?? "TBD")</td>
+                                            <td class="text-end">
+                                                <form method="post" asp-page-handler="Drop" asp-route-enrollmentId="@enrollment.Id" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        <i class="bi bi-dash-circle me-1"></i> Drop Course
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

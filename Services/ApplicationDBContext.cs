@@ -21,7 +21,7 @@ namespace CanvasLMS.Services
         public DbSet<CourseReview> CourseReviews { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Payment> Payments { get; set; }
-
+        public DbSet<AddDropHistory> AddDropHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,7 +36,48 @@ namespace CanvasLMS.Services
             .WithMany()
             .HasForeignKey(ce => ce.StudentId)
             .OnDelete(DeleteBehavior.NoAction);
+
+            // Configure AddDropHistory relationships
+            modelBuilder.Entity<AddDropHistory>()
+            .HasOne(a => a.Semester)
+            .WithMany()
+            .HasForeignKey(a => a.SemesterId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<AddDropHistory>()
+            .HasOne(a => a.Student)
+            .WithMany()
+            .HasForeignKey(a => a.StudentId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<AddDropHistory>()
+            .HasOne(a => a.Course)
+            .WithMany()
+            .HasForeignKey(a => a.CourseId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<AddDropHistory>()
+            .HasOne(a => a.ActionedBy)
+            .WithMany()
+            .HasForeignKey(a => a.ActionedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            // Create composite index for efficient querying by semester and student
+            modelBuilder.Entity<AddDropHistory>()
+            .HasIndex(a => new { a.SemesterId, a.StudentId });
+
+            // Configure SemesterCourse time-related properties
+            modelBuilder.Entity<SemesterCourse>()
+                .Property(sc => sc.StartTime)
+                .IsRequired();
+
+            modelBuilder.Entity<SemesterCourse>()
+                .Property(sc => sc.EndTime)
+                .IsRequired();
+
+            modelBuilder.Entity<SemesterCourse>()
+                .Property(sc => sc.Day)
+                .IsRequired();
         }
     }
-    
 }

@@ -1,0 +1,191 @@
+@page
+@model CanvasLMS.Pages.RegistrationSummary.IndexModel
+@{
+    ViewData["Title"] = "Registration Summary";
+
+    string FormatTime(TimeSpan time)
+    {
+        return DateTime.Today.Add(time).ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+    }
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0 text-primary fw-bold">Registration Summary</h4>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="card-title mb-0 fw-bold text-primary">Enrolled Courses</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 enrolled-courses">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Lecturer</th>
+                                    <th>Schedule</th>
+                                    <th>Credit Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var course in Model.EnrolledCourses)
+                                {
+                                    <tr>
+                                        <td class="fw-medium">@course.CourseName</td>
+                                        <td>@course.LecturerName</td>
+                                        <td><span class="badge bg-light text-dark border">@course.Day.ToString() @FormatTime(course.StartTime) - @FormatTime(course.EndTime)</span></td>
+                                        <td>@course.CreditHours</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="card-title mb-0 fw-bold text-primary">Weekly Timetable</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0 weekly-timetable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Time</th>
+                                    @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                                    {
+                                        <th>@day.ToString()</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var startHour = (int)Model.EarliestTime.TotalHours;
+                                    var endHour = (int)Model.LatestTime.TotalHours + 1;
+
+                                    for (int hour = startHour; hour < endHour; hour++)
+                                    {
+                                        var currentTime = TimeSpan.FromHours(hour);
+                                        <tr>
+                                            <td class="time-column">@FormatTime(currentTime)</td>
+                                            @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                                            {
+                                                <td>
+                                                    @if (Model.TimeTable.ContainsKey(day))
+                                                    {
+                                                        @foreach (var course in Model.TimeTable[day].Where(c =>
+                                                            c.StartTime <= currentTime && c.EndTime >= currentTime))
+                                                        {
+                                                            <div class="course-block">
+                                                                <div class="course-name">@course.CourseName</div>
+                                                                <div class="course-time">@FormatTime(course.StartTime) - @FormatTime(course.EndTime)</div>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table {
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.875rem;
+    }
+
+    .table th {
+        text-align: center;
+        vertical-align: middle;
+        word-wrap: break-word;
+        font-weight: 600;
+        padding: 0.75rem;
+    }
+
+    .table td {
+        text-align: center;
+        vertical-align: top;
+        height: 60px;
+        word-wrap: break-word;
+        padding: 0.5rem;
+        position: relative;
+    }
+
+    .enrolled-courses th {
+        width: 25%;
+    }
+
+    .weekly-timetable {
+        border-color: #e9ecef;
+    }
+
+    .weekly-timetable th:first-child {
+        width: 100px;
+    }
+
+    .weekly-timetable th:not(:first-child) {
+        width: calc((100% - 100px) / 7);
+    }
+
+    .time-column {
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .course-block {
+        background-color: rgba(13, 110, 253, 0.1);
+        border-left: 3px solid #0d6efd;
+        padding: 0.25rem;
+        margin: 0 0 2px 0;
+        min-height: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .course-block + .course-block {
+        margin-top: 2px;
+    }
+
+    .course-name {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #0d6efd;
+        margin-bottom: 0.1rem;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .course-time {
+        font-size: 0.65rem;
+        color: #6c757d;
+        line-height: 1.1;
+    }
+
+    .badge {
+        font-weight: 500;
+    }
+</style>

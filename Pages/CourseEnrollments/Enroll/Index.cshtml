@@ -1,0 +1,194 @@
+@page
+@model CanvasLMS.Pages.CourseEnrollments.Enroll.IndexModel
+@{
+    ViewData["Title"] = "Semester Enrollment";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Alert Messages -->
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+                        <div>@Model.ErrorMessage</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill fs-5 me-2"></i>
+                        <div>@Model.SuccessMessage</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary py-3">
+                    <h4 class="card-title mb-0 text-white">
+                        <i class="bi bi-mortarboard-fill me-2"></i>
+                        Semester Enrollment
+                    </h4>
+                </div>
+
+                @if (Model.OpenSemester != null)
+                {
+                    <div class="alert alert-success border-0 rounded-0 mb-0">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-bell-fill fs-5 me-2"></i>
+                            <div>
+                                Enrollment is now open for @Model.OpenSemester.Name! Enrollment period ends on @Model.OpenSemester.StartDate.ToShortDateString(). You have @((Model.OpenSemester.StartDate - DateTime.Now).Days) days left to enroll.
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (Model.CurrentStudent != null && Model.OpenSemester != null)
+                {
+                    <div class="card-body p-4">
+                        <!-- Student Information Section -->
+                        <section class="mb-5">
+                            <h5 class="border-bottom pb-2 mb-4">
+                                <i class="bi bi-person-badge me-2"></i>
+                                Student Information
+                            </h5>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="d-flex flex-column">
+                                        <div class="mb-2">
+                                            <span class="text-muted">Name:</span>
+                                            <span class="fw-medium ms-2">@Model.CurrentStudent.User?.Name</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-muted">Faculty:</span>
+                                            <span class="fw-medium ms-2">@Model.CurrentStudent.Faculty.Name</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="text-muted">Status:</span>
+                                    <span class="badge bg-success ms-2 px-3 py-2">@Model.CurrentStudent.Status</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Semester Details Section -->
+                        <section>
+                            <h5 class="border-bottom pb-2 mb-4">
+                                <i class="bi bi-calendar3 me-2"></i>
+                                Open Semester Details
+                            </h5>
+                            <div class="card bg-light border-0">
+                                <div class="card-body p-4">
+                                    <h5 class="card-title mb-4">@Model.OpenSemester.Name</h5>
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-calendar2-check text-primary me-2"></i>
+                                                <span>Start: @Model.OpenSemester.StartDate.ToShortDateString()</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-calendar2-x text-primary me-2"></i>
+                                                <span>End: @Model.OpenSemester.EndDate.ToShortDateString()</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-clock-history text-primary me-2"></i>
+                                            <span>Duration: @((Model.OpenSemester.EndDate - Model.OpenSemester.StartDate).Days) days</span>
+                                        </div>
+                                    </div>
+                                    
+                                    @if (!Model.IsAlreadyEnrolled)
+                                    {
+                                        <form method="post">
+                                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                                <i class="bi bi-person-plus-fill me-2"></i>
+                                                Enroll Now
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-info mb-0">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-info-circle-fill fs-5 me-2"></i>
+                                                <div>
+                                                    You are already enrolled in this semester.
+                                                    <a href="/CourseEnrollments/AddDrop" class="alert-link ms-2">
+                                                        Manage your courses
+                                                        <i class="bi bi-arrow-right ms-1"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-body p-4 text-center">
+                        <div class="py-5">
+                            <div class="mb-4">
+                                <i class="bi bi-calendar2-x text-muted" style="font-size: 4rem;"></i>
+                            </div>
+                            <h4 class="mb-3">No Open Enrollment Period</h4>
+                            <p class="text-muted mb-4">
+                                The semester enrollment period is currently closed. Please check back later or contact the academic office for more information.
+                            </p>
+                            <div class="row justify-content-center">
+                                <div class="col-md-8">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <h5 class="card-title mb-3">
+                                                <i class="bi bi-info-circle-fill me-2"></i>
+                                                What you can do:
+                                            </h5>
+                                            <ul class="list-unstyled mb-0">
+                                                <li class="mb-3">
+                                                    <a href="/StudentStatement" class="text-decoration-none">
+                                                        <i class="bi bi-file-text me-2"></i>
+                                                        View your academic statement
+                                                    </a>
+                                                </li>
+                                                <li class="mb-3">
+                                                    <a href="/StudentTranscripts" class="text-decoration-none">
+                                                        <i class="bi bi-journal-text me-2"></i>
+                                                        Check your transcripts
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/ContactUs" class="text-decoration-none">
+                                                        <i class="bi bi-chat-dots me-2"></i>
+                                                        Contact academic support
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

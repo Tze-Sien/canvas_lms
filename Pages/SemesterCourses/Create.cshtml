@@ -16,10 +16,12 @@
             <div class="form-group">
                 <label asp-for="SemesterCourse.SemesterId" class="control-label"></label>
                 <select asp-for="SemesterCourse.SemesterId" class ="form-control" asp-items="ViewBag.SemesterId"></select>
+                <span asp-validation-for="SemesterCourse.SemesterId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="SemesterCourse.CourseId" class="control-label"></label>
                 <select asp-for="SemesterCourse.CourseId" class ="form-control" asp-items="ViewBag.CourseId"></select>
+                <span asp-validation-for="SemesterCourse.CourseId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -31,4 +33,8 @@
 <div>
     <a asp-page="Index">Back to List</a>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
 

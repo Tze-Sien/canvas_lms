@@ -1,0 +1,103 @@
+@page
+@using CanvasLMS.Models
+@model CanvasLMS.Pages.CourseEnrollments.AddDrop.HistoryModel
+@{
+    ViewData["Title"] = "Add/Drop History";
+}
+
+<h1>Add/Drop History</h1>
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <form method="get" class="d-flex">
+                <select class="form-select me-2" asp-for="SemesterId" asp-items="@(new SelectList(Model.Semesters, "Id", "Name"))">
+                    <option value="">All Semesters</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+        </div>
+    </div>
+
+    @if (!Model.History.Any())
+    {
+        <div class="alert alert-info">
+            No add/drop history found.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Semester</th>
+                        <th>Request Type</th>
+                        <th>Status</th>
+                        <th>Requested At</th>
+                        <th>Actioned At</th>
+                        <th>Actioned By</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var record in Model.History)
+                    {
+                        <tr>
+                            <td>@record.Student?.User?.Name</td>
+                            <td>@record.Course?.Name</td>
+                            <td>@record.Semester?.Name</td>
+                            <td>
+                                <span class="badge @(record.Action == EnrollmentStatus.Enrolled ? "bg-success" : "bg-danger")">
+                                    @record.Action
+                                </span>
+                            </td>
+                            <td>
+                                @{
+                                    var statusClass = record.Status switch
+                                    {
+                                        AddDropApproval.Approved => "bg-success",
+                                        AddDropApproval.Rejected => "bg-danger",
+                                        _ => "bg-warning"
+                                    };
+                                }
+                                <span class="badge @statusClass">@record.Status</span>
+                            </td>
+                            <td>@record.RequestedAt.ToString("g")</td>
+                            <td>@(record.ActionedAt?.ToString("g") ?? "-")</td>
+                            <td>@(record.ActionedBy?.User?.Name ?? "-")</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(record.Comment))
+                                {
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-info" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="@record.Comment">
+                                        View
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+}

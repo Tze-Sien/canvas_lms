@@ -2,59 +2,68 @@
 @model CanvasLMS.Pages.CourseReviews.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "My Course Reviews";
 }
 
-<h1>Index</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">My Course Reviews</h1>
+        <a asp-page="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Write New Review
+        </a>
+    </div>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CourseReview[0].CourseEnrollment)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CourseReview[0].Student)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CourseReview[0].Rating)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CourseReview[0].Comment)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CourseReview[0].CreatedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.CourseReview) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CourseEnrollment.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Student.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rating)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Comment)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    @if (!Model.CourseReview.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle me-2"></i>You haven't written any course reviews yet.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var item in Model.CourseReview)
+            {
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title mb-1">@item.CourseEnrollment.SemesterCourse.Course.Name</h5>
+                                    <p class="text-muted small mb-0">
+                                        Reviewed on @item.CreatedAt.ToString("MMMM d, yyyy")
+                                    </p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-pencil me-1"></i>Edit
+                                    </a>
+                                    <a asp-page="/CourseReviews/Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash me-1"></i>Delete
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="text-warning">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="bi @(i <= item.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                        }
+                                    </div>
+                                    <span class="badge bg-warning text-dark">@item.Rating/5</span>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(item.Comment))
+                            {
+                                <p class="card-text mb-0">@item.Comment</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

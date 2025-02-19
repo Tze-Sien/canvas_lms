@@ -1,0 +1,523 @@
+@page
+@model CanvasLMS.Pages.CourseEnrollments.TimeTableMatching.IndexModel
+@{
+    ViewData["Title"] = "Timetable Matching";
+
+    string FormatDay(CanvasLMS.Models.DayOfWeek day)
+    {
+        string[] days = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+        return days[(int)day];
+    }
+}
+
+@section Styles {
+    <style>
+        .swal2-clash-dialog {
+            font-size: 0.9rem;
+        }
+        
+        .swal2-clash-dialog .alert {
+            border-left: 4px solid;
+        }
+        
+        .swal2-clash-dialog .alert-primary {
+            border-left-color: var(--bs-primary);
+        }
+        
+        .swal2-clash-dialog .alert-warning {
+            border-left-color: var(--bs-warning);
+        }
+        
+        .swal2-clash-dialog .alert-danger {
+            border-left-color: var(--bs-danger);
+        }
+
+        /* Animation styles */
+        .table-row-animation {
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(10px);
+        }
+
+        .table-row-animation.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        #planningTable {
+            transition: opacity 0.3s ease;
+        }
+
+        .empty-state-animation {
+            transition: opacity 0.3s ease;
+        }
+
+        /* Planning table styles */
+        #plannedCoursesList button {
+            transition: all 0.2s ease;
+        }
+
+        #plannedCoursesList button:hover {
+            transform: scale(1.05);
+        }
+
+        .badge {
+            transition: all 0.2s ease;
+        }
+
+        tr:hover .badge {
+            transform: scale(1.05);
+        }
+    </style>
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">Timetable Matching</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-warning shadow-sm">
+            <i class="bi bi-exclamation-triangle me-2"></i>@Model.ErrorMessage
+        </div>
+    }
+    else
+    {
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0"><i class="bi bi-funnel me-2"></i>Filter Courses</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get">
+                            <div class="form-group">
+                                <label asp-for="FilterDay" class="form-label">Day</label>
+                                <select asp-for="FilterDay" asp-items="Model.DayOptions" class="form-select">
+                                    <option value="">All Days</option>
+                                </select>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-search me-2"></i>Apply Filters
+                                    </button>
+                                    <a href="/CourseEnrollments/TimeTableMatching" class="btn btn-outline-secondary ms-2">
+                                        <i class="bi bi-x-circle me-2"></i>Clear Filters
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0"><i class="bi bi-journal-text me-2"></i>Available Courses</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            @if (!Model.AvailableCourses.Any())
+                            {
+                                <div class="text-center py-4">
+                                    <i class="bi bi-search text-muted" style="font-size: 2rem;"></i>
+                                    <p class="text-muted mt-2 mb-0">No courses found matching your filter criteria.</p>
+                                    <small class="text-muted">Try adjusting your filters or clear them to see all available courses.</small>
+                                </div>
+                            }
+                            else
+                            {
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Course</th>
+                                            <th>Day</th>
+                                            <th>Start Time</th>
+                                            <th>End Time</th>
+                                            <th>Credit Hours</th>
+                                            <th>Lecturer</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var course in Model.AvailableCourses)
+                                        {
+                                            <tr>
+                                                <td class="fw-medium">@course.CourseName</td>
+                                                <td><span class="badge bg-info text-dark">@FormatDay(course.Day)</span></td>
+                                                <td>@course.StartTime.ToString(@"hh\:mm")</td>
+                                                <td>@course.EndTime.ToString(@"hh\:mm")</td>
+                                                <td><span class="badge bg-secondary">@course.CreditHours</span></td>
+                                                <td>@course.LecturerName</td>
+                                                <td>
+                                                    <button onclick="addToPlanned('@course.Id')" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-plus-circle me-1"></i>Add to Plan
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm" style="position: sticky; top: 1rem;">
+                    <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between py-3">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-calendar3 me-2"></i>Planning Table
+                        </h5>
+                        <span class="badge bg-light text-primary" id="plannedCoursesCount">
+                            @Model.PlannedCourses.Count() courses
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div id="planningTable" class="p-2">
+                            @if (!Model.PlannedCourses.Any())
+                            {
+                                <div class="text-center py-5">
+                                    <i class="bi bi-calendar-plus text-muted" style="font-size: 2.5rem;"></i>
+                                    <p class="text-muted mt-4 mb-0">No courses in your plan yet</p>
+                                    <small class="text-muted">Add courses from the available list</small>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="py-3">Course</th>
+                                                <th class="py-3">Schedule</th>
+                                                <th class="py-3 text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="plannedCoursesList">
+                                            @foreach (var course in Model.PlannedCourses)
+                                            {
+                                                <tr id="course-@course.Id">
+                                                    <td class="fw-medium text-primary py-3">@course.CourseName</td>
+                                                    <td class="py-3">
+                                                        <div class="d-flex flex-column gap-2">
+                                                            <span class="badge bg-info text-dark">
+                                                                <i class="bi bi-calendar-day me-1"></i>@FormatDay(course.Day)
+                                                            </span>
+                                                            <small class="text-muted">
+                                                                <i class="bi bi-clock me-1"></i>@course.StartTime.ToString(@"hh\:mm") - @course.EndTime.ToString(@"hh\:mm")
+                                                            </small>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center py-3">
+                                                        <button onclick="removeFromPlanned('@course.Id')" 
+                                                                class="btn btn-outline-danger" 
+                                                                title="Remove from plan">
+                                                            <i class="bi bi-trash me-1"></i>Remove
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function formatTime(timeStr) {
+            const time = new Date(`1970-01-01T${timeStr}`);
+            return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatDay(dayIndex) {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            return days[dayIndex];
+        }
+
+        function handleResponse(response) {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        }
+
+        function appendCourseToPlannedTable(course) {
+            const planningTable = document.getElementById('planningTable');
+            
+            if (!document.getElementById('plannedCoursesList')) {
+                const emptyState = planningTable.querySelector('.text-center');
+                if (emptyState) {
+                    emptyState.classList.add('empty-state-animation');
+                    emptyState.style.opacity = '0';
+                    setTimeout(() => {
+                        // Replace empty state with table structure
+                        planningTable.innerHTML = `
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="border-0">Course</th>
+                                            <th class="border-0">Schedule</th>
+                                            <th class="border-0 text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="plannedCoursesList"></tbody>
+                                </table>
+                            </div>
+                        `;
+                        
+                        // Now add the new course
+                        addCourseRow(course);
+                    }, 300);
+                }
+            } else {
+                addCourseRow(course);
+            }
+        }
+
+        function addCourseRow(course) {
+            const tbody = document.getElementById('plannedCoursesList');
+            const tr = document.createElement('tr');
+            tr.id = `course-${course.id}`;
+            tr.className = 'table-row-animation';
+            tr.innerHTML = `
+                <td class="fw-medium text-primary py-3">${course.courseName}</td>
+                <td class="py-3">
+                    <div class="d-flex flex-column gap-2">
+                        <span class="badge bg-info text-dark">
+                            <i class="bi bi-calendar-day me-1"></i>${formatDay(course.day)}
+                        </span>
+                        <small class="text-muted">
+                            <i class="bi bi-clock me-1"></i>${formatTime(course.startTime)} - ${formatTime(course.endTime)}
+                        </small>
+                    </div>
+                </td>
+                <td class="text-center py-3">
+                    <button onclick="removeFromPlanned('${course.id}')" 
+                            class="btn btn-outline-danger" 
+                            title="Remove from plan">
+                        <i class="bi bi-trash me-1"></i>Remove
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+            
+            // Trigger fade in animation
+            requestAnimationFrame(() => tr.classList.add('fade-in'));
+            
+            // Update the course count badge
+            const countBadge = document.getElementById('plannedCoursesCount');
+            const currentCount = tbody.getElementsByTagName('tr').length;
+            countBadge.textContent = `${currentCount} courses`;
+        }
+
+        function showEmptyPlanningTable() {
+            const planningTable = document.getElementById('planningTable');
+            planningTable.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-plus text-muted" style="font-size: 2.5rem;"></i>
+                    <p class="text-muted mt-4 mb-0">No courses in your plan yet</p>
+                    <small class="text-muted">Add courses from the available list</small>
+                </div>
+            `;
+        }
+
+        function showErrorDialog(message) {
+            return Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: message,
+                confirmButtonColor: '#3085d6'
+            });
+        }
+
+        function showSuccessDialog(message) {
+            return Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: message,
+                confirmButtonColor: '#3085d6',
+                timer: 1500
+            });
+        }
+
+        function showConfirmDialog(message) {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'Are you sure?',
+                text: message,
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No'
+            });
+        }
+
+        function addToPlanned(courseId) {
+            // Check if course is already in the plan
+            if (document.getElementById(`course-${courseId}`)) {
+                showErrorDialog('This course is already in your plan.');
+                return;
+            }
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            fetch(`?handler=AddToPlanned&courseId=${courseId}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token,
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return handleResponse(response);
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    appendCourseToPlannedTable(data.course);
+                    showSuccessDialog('Course added to your plan successfully!');
+                } else {
+                    if (data.clashingCourse) {
+                        // Get selected course details from the table row
+                        const courseRow = document.querySelector(`button[onclick="addToPlanned('${courseId}')"]`).closest('tr');
+                        const selectedCourseName = courseRow.querySelector('td:first-child').textContent;
+                        const selectedCourseDay = courseRow.querySelector('td:nth-child(2) .badge').textContent;
+                        const selectedCourseStart = courseRow.querySelector('td:nth-child(3)').textContent;
+                        const selectedCourseEnd = courseRow.querySelector('td:nth-child(4)').textContent;
+                        
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Time Clash Detected!',
+                            html: `
+                                <div class="text-start">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="alert alert-primary mb-0">
+                                                <h6 class="alert-heading mb-2">Selected Course:</h6>
+                                                <p class="mb-1"><strong>Course:</strong> ${selectedCourseName}</p>
+                                                <p class="mb-1"><strong>Day:</strong> ${selectedCourseDay}</p>
+                                                <p class="mb-0"><strong>Time:</strong> ${selectedCourseStart} - ${selectedCourseEnd}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="alert alert-warning mb-0">
+                                                <h6 class="alert-heading mb-2">Clashing Course:</h6>
+                                                <p class="mb-1"><strong>Course:</strong> ${data.clashingCourse.courseName}</p>
+                                                <p class="mb-1"><strong>Day:</strong> ${formatDay(data.clashingCourse.day)}</p>
+                                                <p class="mb-0"><strong>Time:</strong> ${formatTime(data.clashingCourse.startTime)} - ${formatTime(data.clashingCourse.endTime)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-danger mt-3 mb-0">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        <strong>Cannot add course:</strong> ${data.message}
+                                    </div>
+                                </div>
+                            `,
+                            width: '800px',
+                            confirmButtonColor: '#dc3545',
+                            confirmButtonText: 'Got it',
+                            customClass: {
+                                popup: 'swal2-clash-dialog',
+                            }
+                        });
+                    } else {
+                        showErrorDialog(data.message || 'Failed to add course');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorDialog(`An error occurred while adding the course: ${error.message}`);
+            });
+        }
+
+        function removeFromPlanned(courseId) {
+            showConfirmDialog('Do you want to remove this course from your plan?')
+            .then((result) => {
+                if (result.isConfirmed) {
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    const row = document.getElementById(`course-${courseId}`);
+                    
+                    if (row) {
+                        row.classList.add('fade-out');
+                    }
+
+                    fetch(`?handler=RemoveFromPlanned&courseId=${courseId}`, {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token,
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        }
+                    })
+                    .then(handleResponse)
+                    .then(data => {
+                        if (data.success) {
+                            const tbody = document.getElementById('plannedCoursesList');
+                            
+                            setTimeout(() => {
+                                if (row) {
+                                    row.remove();
+                                }
+                                
+                                const countBadge = document.getElementById('plannedCoursesCount');
+                                const currentCount = tbody.getElementsByTagName('tr').length;
+                                countBadge.textContent = `${currentCount} courses`;
+
+                                if (currentCount === 0) {
+                                    const planningTable = document.getElementById('planningTable');
+                                    planningTable.style.opacity = '0';
+                                    setTimeout(() => {
+                                        showEmptyPlanningTable();
+                                        requestAnimationFrame(() => {
+                                            planningTable.style.opacity = '1';
+                                        });
+                                    }, 300);
+                                }
+                                
+                                showSuccessDialog('Course removed from your plan');
+                            }, 300);
+                        } else {
+                            if (row) {
+                                row.classList.remove('fade-out');
+                            }
+                            showErrorDialog(data.message || 'Failed to remove course');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        if (row) {
+                            row.classList.remove('fade-out');
+                        }
+                        showErrorDialog(`An error occurred while removing the course: ${error.message}`);
+                    });
+                }
+            });
+        }
+    </script>
+}

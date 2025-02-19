@@ -23,7 +23,9 @@ namespace CanvasLMS.Pages.Semesters
 
         public async Task OnGetAsync()
         {
-            Semester = await _context.Semesters.ToListAsync();
+            Semester = await _context.Semesters
+                .Include(s => s.Faculty)
+                .ToListAsync();
         }
     }
 }

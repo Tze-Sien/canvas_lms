@@ -1,0 +1,14 @@
+@model List<(string Text, string Link)>
+
+<nav aria-label="breadcrumb" class="mt-2 mb-3">
+    <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item">
+            <a href="/" class="text-decoration-none"><i class="bi bi-house-door"></i></a>
+        </li>
+        @if (Model.Any())
+        {
+            var (text, _) = Model[0];
+            <li class="breadcrumb-item active" aria-current="page">@text</li>
+        }
+    </ol>
+</nav>

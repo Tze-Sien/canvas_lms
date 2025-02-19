@@ -21,20 +21,17 @@
                 <span asp-validation-for="Course.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                
                 <label asp-for="Course.CreditHours" class="control-label"></label>
                 <input asp-for="Course.CreditHours" class="form-control" />
                 <span asp-validation-for="Course.CreditHours" class="text-danger"></span>
             </div>
             <div class="form-group">
-                
-                <label asp-for="Course.FacultyId" class="control-label"></label>
+                <label asp-for="Course.FacultyId" class="control-label">Faculty</label>
                 <select asp-for="Course.FacultyId" class="form-control" asp-items="ViewBag.FacultyId"></select>
                 <span asp-validation-for="Course.FacultyId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                
-                <label asp-for="Course.LecturerId" class="control-label"></label>
+                <label asp-for="Course.LecturerId" class="control-label">Lecturer</label>
                 <select asp-for="Course.LecturerId" class="form-control" asp-items="ViewBag.LecturerId"></select>
                 <span asp-validation-for="Course.LecturerId" class="text-danger"></span>
             </div>

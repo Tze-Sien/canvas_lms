@@ -19,26 +19,53 @@ namespace CanvasLMS.Pages.Semesters
             _context = context;
         }
 
-        public IActionResult OnGet()
-        {
-            return Page();
-        }
+        public SelectList FacultyList { get; set; } = default!;
 
         [BindProperty]
         public Semester Semester { get; set; } = default!;
 
+        public IActionResult OnGet()
+        {
+            FacultyList = new SelectList(_context.Faculties, "Id", "Name");
+            Semester = new Semester { Name = "" };
+            return Page();
+        }
+
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            if (Semester.FacultyId == Guid.Empty)
+            {
+                ModelState.AddModelError("Semester.FacultyId", "Faculty is required");
+            }
+
             if (!ModelState.IsValid)
             {
+                FacultyList = new SelectList(_context.Faculties, "Id", "Name");
                 return Page();
             }
 
-            _context.Semesters.Add(Semester);
-            await _context.SaveChangesAsync();
+            var faculty = await _context.Faculties.FindAsync(Semester.FacultyId);
+            if (faculty == null)
+            {
+                ModelState.AddModelError("Semester.FacultyId", "Selected faculty not found");
+                FacultyList = new SelectList(_context.Faculties, "Id", "Name");
+                return Page();
+            }
 
-            return RedirectToPage("./Index");
+            try
+            {
+                Semester.Faculty = faculty;
+                _context.Semesters.Add(Semester);
+                await _context.SaveChangesAsync();
+                return RedirectToPage("./Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Error saving semester: " + ex.Message);
+                FacultyList = new SelectList(_context.Faculties, "Id", "Name");
+                return Page();
+            }
         }
     }
 }

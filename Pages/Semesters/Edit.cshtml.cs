@@ -22,6 +22,8 @@ namespace CanvasLMS.Pages.Semesters
 
         [BindProperty]
         public Semester Semester { get; set; } = default!;
+        
+        public SelectList FacultyList { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(Guid? id)
         {
@@ -30,12 +32,13 @@ namespace CanvasLMS.Pages.Semesters
                 return NotFound();
             }
 
-            var semester =  await _context.Semesters.FirstOrDefaultAsync(m => m.Id == id);
+            var semester = await _context.Semesters.Include(s => s.Faculty).FirstOrDefaultAsync(m => m.Id == id);
             if (semester == null)
             {
                 return NotFound();
             }
             Semester = semester;
+            FacultyList = new SelectList(_context.Faculties, "Id", "Name");
             return Page();
         }
 
@@ -45,6 +48,15 @@ namespace CanvasLMS.Pages.Semesters
         {
             if (!ModelState.IsValid)
             {
+                FacultyList = new SelectList(_context.Faculties, "Id", "Name");
+                return Page();
+            }
+
+            var faculty = await _context.Faculties.FindAsync(Semester.FacultyId);
+            if (faculty == null)
+            {
+                ModelState.AddModelError("Semester.FacultyId", "Selected faculty not found");
+                FacultyList = new SelectList(_context.Faculties, "Id", "Name");
                 return Page();
             }
 
