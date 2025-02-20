@@ -50,7 +50,7 @@ public class IndexModel : PageModel
         {
             NavigationLinks = new List<(string title, string url, string ImageUrl)>
             {
-                ("Manage Users", "/Students/Create", "https://via.placeholder.com/100"),
+                ("Manage Users", "/Users/Index", "https://via.placeholder.com/100"),
                 ("Manage Faculties", "/Faculties/Create", "https://via.placeholder.com/100"),
                 ("Manage Semesters", "/Semesters/Create", "https://via.placeholder.com/100"),
                 ("Manage Payments", "/Payments/Create", "https://via.placeholder.com/100"),
