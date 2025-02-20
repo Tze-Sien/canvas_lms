@@ -20,10 +20,38 @@ namespace CanvasLMS.Pages.Users
         }
 
         public IList<User> User { get;set; } = default!;
+        public string SortOrder { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(string sortOrder)
         {
-            User = await _context.Users.ToListAsync();
+            SortOrder = sortOrder;
+
+            var users = from u in _context.Users
+                        select u;
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    users = users.OrderByDescending(u => u.Name);
+                    break;
+                case "email_asc":
+                    users = users.OrderBy(u => u.Email);
+                    break;
+                case "email_desc":
+                    users = users.OrderByDescending(u => u.Email);
+                    break;
+                case "role_asc":
+                    users = users.OrderBy(u => u.Role);
+                    break;
+                case "role_desc":
+                    users = users.OrderByDescending(u => u.Role);
+                    break;
+                default:
+                    users = users.OrderBy(u => u.Name);
+                    break;
+            }
+
+            User = await users.ToListAsync();
         }
     }
 }
