@@ -120,7 +120,7 @@ namespace CanvasLMS.Models
         [Required]
         public TimeSpan EndTime { get; set; }
 
-
+        public float Fee { get; set; }
     }
 
     public class SemesterStudent
