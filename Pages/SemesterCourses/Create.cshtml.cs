@@ -22,8 +22,13 @@ namespace CanvasLMS.Pages.SemesterCourses
         public IActionResult OnGet()
         {
             PopulateDropDowns();
+            Semesters = _context.Semesters.ToList();
+            Courses = _context.Courses.ToList();
             return Page();
         }
+
+        public List<Semester> Semesters { get; set; }
+        public List<Course> Courses { get; set; }
 
         [BindProperty]
         public SemesterCourse SemesterCourse { get; set; } = default!;
