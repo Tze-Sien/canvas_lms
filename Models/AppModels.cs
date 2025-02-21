@@ -51,7 +51,7 @@ namespace CanvasLMS.Models
         [ForeignKey("Faculty")]
         public Guid FacultyId { get; set; }
         public Faculty? Faculty { get; set; }
-        [ForeignKey("Lecturer")]
+        [ForeignKey("User")]
         public Guid? LecturerId { get; set; }
         public Lecturer? Lecturer { get; set; }
     }
@@ -60,15 +60,15 @@ namespace CanvasLMS.Models
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        
+
         [ForeignKey("Faculty")]
         public Guid FacultyId { get; set; }
         public Faculty? Faculty { get; set; }
-        
+
         [ForeignKey("User")]
         public Guid UserId { get; set; }
         public User? User { get; set; }
-        
+
         public string? Address { get; set; }
         public string? Postcode { get; set; }
         public string? City { get; set; }
@@ -77,7 +77,7 @@ namespace CanvasLMS.Models
         public string? BankAcc { get; set; }
         public string? BankName { get; set; }
         public string? BankHolderName { get; set; }
-        
+
         [Required(ErrorMessage = "Status is required")]
         public StudentStatus Status { get; set; }
     }
@@ -91,19 +91,19 @@ namespace CanvasLMS.Models
         public Faculty? Faculty { get; set; }
         [ForeignKey("User")]
         public Guid UserId { get; set; }
-        public  User? User { get; set; }
+        public User? User { get; set; }
     }
 
     public class SemesterCourse
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        
+
         [DisplayName("Semester")]
         [ForeignKey("Semester")]
         public Guid SemesterId { get; set; }
         public Semester? Semester { get; set; }
-        
+
         [DisplayName("Course")]
         [ForeignKey("Course")]
         public Guid CourseId { get; set; }
@@ -141,7 +141,7 @@ namespace CanvasLMS.Models
         [ForeignKey("SemesterCourse")]
         public Guid SemesterCourseId { get; set; }
         public SemesterCourse? SemesterCourse { get; set; }
-        [ForeignKey("Student")] 
+        [ForeignKey("Student")]
         public Guid StudentId { get; set; }
         public Student? Student { get; set; }
         public AddDropApproval Approval { get; set; }
@@ -206,32 +206,32 @@ namespace CanvasLMS.Models
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        
+
         [Required]
         [ForeignKey("Semester")]
         public Guid SemesterId { get; set; }
         public Semester? Semester { get; set; }
-        
+
         [Required]
         [ForeignKey("Student")]
         public Guid StudentId { get; set; }
         public Student? Student { get; set; }
-        
+
         [Required]
         [ForeignKey("Course")]
         public Guid CourseId { get; set; }
         public Course? Course { get; set; }
-        
+
         public EnrollmentStatus Action { get; set; }
         public AddDropApproval Status { get; set; } = AddDropApproval.Pending;
-        
+
         public DateTime RequestedAt { get; set; }
         public DateTime? ActionedAt { get; set; }
-        
+
         [ForeignKey("ActionedBy")]
         public Guid? ActionedById { get; set; }
         public Lecturer? ActionedBy { get; set; }
-        
+
         public string? Comment { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace CanvasLMS.Pages.Courses
         {
             ViewData["FacultyId"] = new SelectList(_context.Faculties.AsNoTracking(), "Id", "Name");
 
-            
+
             ViewData["LecturerId"] = new SelectList(_context.Users.Where(u => u.Role == Role.Lecturer).AsNoTracking(), "Id", "Name");
         }
 
@@ -37,12 +37,18 @@ namespace CanvasLMS.Pages.Courses
         [BindProperty]
         public Course Course { get; set; } = default!;
 
+        // static void PrintProperties(object obj)
+        // {
+        //     foreach (var prop in obj.GetType().GetProperties())
+        //         Console.WriteLine($"{prop.Name}: {prop.GetValue(obj)}");
+        //     Console.Out.Flush();
+        // }
+
         public async Task<IActionResult> OnPostAsync()
         {
 
-
             // Verify Faculty exists
-            var faculty = await _context.Faculties.FindAsync(Course.FacultyId);
+            var faculty = _context.Faculties.Find(Course.FacultyId);
             if (faculty == null)
             {
                 ModelState.AddModelError("Course.FacultyId", "Selected faculty not found");
@@ -50,26 +56,8 @@ namespace CanvasLMS.Pages.Courses
                 return Page();
             }
 
-            {
-                var lecturer = await _context.Lecturers
-                    .Include(l => l.Faculty)
-                    .FirstOrDefaultAsync(l => l.Id == Course.LecturerId);
-                
-                if (lecturer == null)
-                {
-                    ModelState.AddModelError("Course.LecturerId", "Selected lecturer not found");
-                    LoadDropDowns();
-                    return Page();
-                }
 
-                // Verify lecturer belongs to the selected faculty
-                if (lecturer.FacultyId != Course.FacultyId)
-                {
-                    ModelState.AddModelError("Course.LecturerId", "Lecturer must belong to the selected faculty");
-                    LoadDropDowns();
-                    return Page();
-                }
-            }
+            this.Course.LecturerId = null;
 
             _context.Courses.Add(Course);
             await _context.SaveChangesAsync();
