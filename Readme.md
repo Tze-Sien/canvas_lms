@@ -1,152 +1,101 @@
-# CanvasLMS Development Setup Guide
+# CanvasLMS
 
-This document explains how to set up the development environment for CanvasLMS. It covers:
-
-- **VS Code Setup:** Opening and working on the project in Visual Studio Code.
-- **Database Setup (Docker Compose):** Creating and managing the development database.
-- **EF Core Migrations:** Adding, updating, and rolling back migrations.
-- **Starting Your Project:** Running the project with live reloading and troubleshooting restart issues.
-
----
+A learning management system built with ASP.NET Core.
 
 ## Prerequisites
 
-Make sure you have the following installed:
+Before you begin, ensure you have the following installed:
 
-- [Visual Studio Code](https://code.visualstudio.com/)
-- [.NET SDK](https://dotnet.microsoft.com/download)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop) (Docker Compose enabled)
-- (Optional) [Docker Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
-- (Optional) [Git](https://git-scm.com/)
+1. **.NET 7.0 SDK or later**
+   - Download from: https://dotnet.microsoft.com/download
+   - Verify installation: `dotnet --version`
 
----
+2. **Git Bash (Windows users)**
+   - Download from: https://git-scm.com/download/win
+   - Required for running the setup script on Windows
 
-## 1. VS Code Setup
+3. **SQL Server**
+   - You can choose how to set up the SQL Server:
+     - **Option 1:** Use Docker Compose (Recommended for quick setup)
+     - **Option 2:** Use an existing local or remote MSSQL Server
 
-1. **Clone the Repository:**
+## Database Setup Options
 
-   ```bash
-   git clone https://github.com/Tze-Sien/canvas_lms.git
-   cd CanvasLMS
-   ```
+### Option 1: Using Docker Compose
 
-2. **Open the Project:**
-
-   - Launch VS Code.
-   - Open the folder via **File > Open Folder…**.
-
-3. **Install Recommended Extensions:**
-
-   - C# Dev Kit
-   - Docker
-
-
----
-
-## 2. Database Setup with Docker Compose
-
-The project includes a `docker-compose.yml` file at the root to manage the database container.
-
-### Build and Start Containers:
-
+1. Start the SQL Server container:
 ```bash
 docker-compose up -d
 ```
 
-This command builds (if needed) and starts the defined services.
-
-### Verify Containers:
-
+2. Set up the database with the setup script:
 ```bash
-docker-compose ps
+./setup-database.sh localhost sa SU2orange! 
 ```
 
-### Stop Containers (if needed):
+### Option 2: Using Local/Remote MSSQL Server
 
+1. Ensure your MSSQL Server is running and accessible.
+2. Set up the database with the setup script, replacing `<db_host>`, `<db_user>`, and `<db_password>` with your server's credentials:
 ```bash
-docker-compose down
+./setup-database.sh <db_host> <db_user> <db_password> <db_port>
+```
+Example:
+```bash
+./setup-database.sh 192.168.1.100 sa SU2orange! 1433
 ```
 
----
-
-## 3. Managing EF Core Migrations
-
-Keep your database schema in sync with your application model by using EF Core migrations.
-
-### Add a Migration:
-
-```bash
-dotnet ef migrations add <MigrationName>
+## Starting the Application with Seed data
+Note: For window user. Please run with GitBash
+```
+./setup-database.sh <db_host> <db_user> <db_password>
 ```
 
-Replace `<MigrationName>` with a descriptive name (e.g., `InitialCreate`).
+## Default Development Credentials
 
-### Apply the Migration:
+- Host: `localhost` (or your specified host)
+- User: `sa`
+- Password: `SU2orange!`
 
-```bash
-dotnet ef database update
-```
+## Running the Application
 
-This command applies all pending migrations to update the database schema.
+After database setup is complete, the application will automatically start at:
+http://localhost:5285
 
-### Reverting a Migration:
+## Available Accounts
 
-To roll back to a specific migration:
+1. **Admin Account**
+   - Email: admin@gmail.com
+   - Password: admin
 
-```bash
-dotnet ef database update <TargetMigration>
-```
+2. **Lecturer Account**
+   - Email: lecturer@gmail.com
+   - Password: lecturer
 
-The `<TargetMigration>` is the name of the migration to which you wish to revert.
+3. **Student Account**
+   - Email: student@gmail.com
+   - Password: student
 
-> **Reference:** For further details on EF Core migrations, refer to [Microsoft’s EF Core Migrations Overview](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/).
+## Notes for Windows Users
 
----
-
-## 4. Running Your Project
-
-To run CanvasLMS and enable live reloading during development:
-
-### Start the Application with Watch Mode:
-
-```bash
-dotnet watch run
-```
-
-This command automatically restarts your application when code changes are detected.
-
-### Manual Restart:
-
-If live reloading fails, press `Ctrl+C` to stop the process and re-run the command above.
-
-### Access the Application:
-
-Open your browser and navigate to `http://localhost:5000` (or the port specified by your project).
-
----
+- Install Git Bash from https://git-scm.com/download/win
+- Run all commands in Git Bash terminal
+- Use `./setup-database.sh` as shown (avoid backslashes)
 
 ## Troubleshooting
 
-### Docker Issues:
+1. **Script Permission Issues**
+```bash
+chmod +x setup-database.sh
+```
 
-- Use `docker-compose logs` to inspect container logs.
-- Ensure Docker Desktop is running properly.
+2. **Database Connection Issues**
+- Verify Docker is running (if using Docker Compose)
+- Check SQL Server container status:
+```bash
+docker ps
+docker logs canvas-lms-db
+```
 
-### EF Core Migrations:
-
-- Verify the connection string in your `DbContext` configuration.
-- Ensure the `Microsoft.EntityFrameworkCore.Tools` package is installed.
-
-### VS Code Issues:
-
-- Reload VS Code or reopen the folder if extensions behave unexpectedly.
-- Check the integrated terminal for error messages.
-
----
-
-## Additional Resources
-
-- [EF Core Migrations Documentation](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
-- [Docker Compose Documentation](https://docs.docker.com/compose/)
-- [VS Code Dev Containers Guide](https://code.visualstudio.com/docs/devcontainers/create-dev-container)
+- If using a local MSSQL Server, verify network access and credentials
 

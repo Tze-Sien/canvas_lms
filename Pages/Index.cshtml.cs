@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 
 namespace CanvasLMS.Pages;
 
@@ -28,7 +29,10 @@ public class IndexModel : PageModel
 
         if (user == null)
         {
-            throw new InvalidOperationException("User not found");
+            // Sign out the user if not found in database
+            HttpContext.SignOutAsync("CookieAuth").Wait();
+            Response.Redirect("/Logout");
+            return;
         }
 
         UserName = user.Name;
