@@ -23,14 +23,9 @@ namespace CanvasLMS.Pages.Courses
         private void LoadDropDowns()
         {
             ViewData["FacultyId"] = new SelectList(_context.Faculties.AsNoTracking(), "Id", "Name");
-            ViewData["LecturerId"] = new SelectList(
-                _context.Lecturers
-                    .Include(l => l.User)
-                    .Include(l => l.Faculty)
-                    .AsNoTracking(),
-                "Id", 
-                "User.Name"
-            );
+
+            
+            ViewData["LecturerId"] = new SelectList(_context.Users.Where(u => u.Role == Role.Lecturer).AsNoTracking(), "Id", "Name");
         }
 
         public IActionResult OnGet()
@@ -44,11 +39,7 @@ namespace CanvasLMS.Pages.Courses
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                LoadDropDowns();
-                return Page();
-            }
+
 
             // Verify Faculty exists
             var faculty = await _context.Faculties.FindAsync(Course.FacultyId);
@@ -59,8 +50,6 @@ namespace CanvasLMS.Pages.Courses
                 return Page();
             }
 
-            // Verify Lecturer exists if selected
-            if (Course.LecturerId.HasValue)
             {
                 var lecturer = await _context.Lecturers
                     .Include(l => l.Faculty)
