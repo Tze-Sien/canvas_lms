@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CanvasLMS.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250221074448_AddAgeToStudent")]
-    partial class AddAgeToStudent
+    [Migration("20250221130711_InitialSync")]
+    partial class InitialSync
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,9 +88,6 @@ namespace CanvasLMS.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("basket")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -291,9 +288,6 @@ namespace CanvasLMS.Migrations
 
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
-
-                    b.Property<decimal>("Fee")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("SemesterId")
                         .HasColumnType("uniqueidentifier");

@@ -5,25 +5,25 @@
 namespace CanvasLMS.Migrations
 {
     /// <inheritdoc />
-    public partial class AddFeeColumnTypeToSemesterCourse : Migration
+    public partial class removeFee : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<decimal>(
+            migrationBuilder.DropColumn(
                 name: "Fee",
-                table: "SemesterCourses",
-                type: "decimal(18,2)",
-                nullable: false,
-                defaultValue: 0m);
+                table: "Courses");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
+            migrationBuilder.AddColumn<float>(
                 name: "Fee",
-                table: "SemesterCourses");
+                table: "Courses",
+                type: "real",
+                nullable: false,
+                defaultValue: 0f);
         }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CanvasLMS.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250218131233_AddSemesterStatus")]
-    partial class AddSemesterStatus
+    [Migration("20250221131635_addFees")]
+    partial class addFees
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,52 @@ namespace CanvasLMS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CanvasLMS.Models.AddDropHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Action")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ActionedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ActionedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SemesterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionedById");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("SemesterId", "StudentId");
+
+                    b.ToTable("AddDropHistories");
+                });
 
             modelBuilder.Entity("CanvasLMS.Models.Course", b =>
                 {
@@ -36,6 +82,9 @@ namespace CanvasLMS.Migrations
 
                     b.Property<Guid>("FacultyId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<float>("Fee")
+                        .HasColumnType("real");
 
                     b.Property<Guid?>("LecturerId")
                         .HasColumnType("uniqueidentifier");
@@ -61,9 +110,6 @@ namespace CanvasLMS.Migrations
 
                     b.Property<int>("Approval")
                         .HasColumnType("int");
-
-                    b.Property<bool>("Approved")
-                        .HasColumnType("bit");
 
                     b.Property<Guid>("SemesterCourseId")
                         .HasColumnType("uniqueidentifier");
@@ -226,6 +272,8 @@ namespace CanvasLMS.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FacultyId");
+
                     b.ToTable("Semesters");
                 });
 
@@ -238,8 +286,17 @@ namespace CanvasLMS.Migrations
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Day")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
                     b.Property<Guid>("SemesterId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
 
                     b.HasKey("Id");
 
@@ -364,12 +421,46 @@ namespace CanvasLMS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Role")
+                    b.Property<int?>("Role")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("CanvasLMS.Models.AddDropHistory", b =>
+                {
+                    b.HasOne("CanvasLMS.Models.Lecturer", "ActionedBy")
+                        .WithMany()
+                        .HasForeignKey("ActionedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("CanvasLMS.Models.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("CanvasLMS.Models.Semester", "Semester")
+                        .WithMany()
+                        .HasForeignKey("SemesterId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("CanvasLMS.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ActionedBy");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Semester");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("CanvasLMS.Models.Course", b =>
@@ -466,6 +557,17 @@ namespace CanvasLMS.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CanvasLMS.Models.Semester", b =>
+                {
+                    b.HasOne("CanvasLMS.Models.Faculty", "Faculty")
+                        .WithMany()
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Faculty");
                 });
 
             modelBuilder.Entity("CanvasLMS.Models.SemesterCourse", b =>

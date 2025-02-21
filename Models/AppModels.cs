@@ -54,6 +54,8 @@ namespace CanvasLMS.Models
         [ForeignKey("User")]
         public Guid? LecturerId { get; set; }
         public Lecturer? Lecturer { get; set; }
+
+        public float Fee { get; set; }
     }
 
     public class Student
@@ -118,8 +120,7 @@ namespace CanvasLMS.Models
         [Required]
         public TimeSpan EndTime { get; set; }
 
-        [Required]
-        public decimal Fee { get; set; }
+
     }
 
     public class SemesterStudent

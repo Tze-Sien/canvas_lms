@@ -5,7 +5,7 @@
 namespace CanvasLMS.Migrations
 {
     /// <inheritdoc />
-    public partial class foreignkeyUserChanges : Migration
+    public partial class addFee : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,9 @@ namespace CanvasLMS.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.DropColumn(
+                name: "Fee",
+                table: "Courses");
         }
     }
 }
