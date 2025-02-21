@@ -43,7 +43,8 @@ public class IndexModel : PageModel
                 ("Course Add/Drop", "/CourseEnrollments/AddDrop/Index", "https://via.placeholder.com/100"),
                 ("Course Evaluation", "/CourseReviews/Index", "https://via.placeholder.com/100"),
                 ("Student Statement", "/StudentStatement/Index", "https://via.placeholder.com/100"),
-                ("Class Timetable", "/RegistrationSummary/Index", "https://via.placeholder.com/100")
+                ("Class Timetable", "/RegistrationSummary/Index", "https://via.placeholder.com/100"),
+                ("Manage Payments", "/Payments/Index", "https://via.placeholder.com/100")
             };
         }
         else

@@ -21,16 +21,26 @@ namespace CanvasLMS.Pages.Payments
 
         public IActionResult OnGet()
         {
-        ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email");
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email");
             return Page();
         }
 
         [BindProperty]
         public Payment Payment { get; set; } = default!;
 
+        // static void PrintProperties(object obj)
+        static void PrintProperties(object obj)
+        {
+            foreach (var prop in obj.GetType().GetProperties())
+                Console.WriteLine($"{prop.Name}: {prop.GetValue(obj)}");
+            Console.Out.Flush();
+        }
+
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+
+            //PrintProperties(Payment);
             if (!ModelState.IsValid)
             {
                 return Page();

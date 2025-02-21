@@ -196,7 +196,6 @@ namespace CanvasLMS.Models
         public Guid Id { get; set; } = Guid.NewGuid();
         [ForeignKey("User")]
         public Guid UserId { get; set; }
-        public required User User { get; set; }
         public int Amount { get; set; }
         public PaymentStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
