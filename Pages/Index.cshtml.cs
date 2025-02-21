@@ -55,7 +55,7 @@ public class IndexModel : PageModel
                 ("Manage Faculties", "/Faculties/Create", "https://via.placeholder.com/100"),
                 ("Manage Semesters", "/Semesters/Create", "https://via.placeholder.com/100"),
                 ("Manage Payments", "/Payments/Create", "https://via.placeholder.com/100"),
-                ("Manage Courses", "/Courses/Create", "https://via.placeholder.com/100")
+                ("Manage Courses", "/SemesterCourses/Create", "https://via.placeholder.com/100")
             };
         }
     }
