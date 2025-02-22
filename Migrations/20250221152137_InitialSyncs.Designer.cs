@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CanvasLMS.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250221131109_addFee")]
-    partial class addFee
+    [Migration("20250221152137_InitialSyncs")]
+    partial class InitialSyncs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -291,6 +291,9 @@ namespace CanvasLMS.Migrations
 
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
+
+                    b.Property<decimal>("Fee")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<Guid>("SemesterId")
                         .HasColumnType("uniqueidentifier");

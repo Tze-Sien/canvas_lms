@@ -1,9 +1,9 @@
 using CanvasLMS.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CanvasLMS.Services 
+namespace CanvasLMS.Services
 {
-    public class ApplicationDBContext: DbContext
+    public class ApplicationDBContext : DbContext
     {
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> contextOptions) : base(contextOptions)
         { }
@@ -78,6 +78,13 @@ namespace CanvasLMS.Services
             modelBuilder.Entity<SemesterCourse>()
                 .Property(sc => sc.Day)
                 .IsRequired();
+
+            // modelBuilder.Entity<SemesterCourse>()
+            //     .Property(e => e.Fee)
+            //     .HasColumnType("float"); // Ensure SQL Server uses FLOAT instead of DECIMAL
+            modelBuilder.Entity<SemesterCourse>()
+                .Property(e => e.Fee)
+                .HasColumnType("decimal(18, 2)");
         }
     }
 }

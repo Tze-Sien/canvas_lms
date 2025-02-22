@@ -23,7 +23,15 @@ namespace CanvasLMS.Pages.SemesterCourses
         {
             PopulateDropDowns();
             Semesters = _context.Semesters.ToList();
-            Courses = _context.Courses.ToList();
+            Courses = _context.Courses.Select(c => new Course
+            {
+                Id = c.Id,
+                Name = c.Name,
+                CreditHours = c.CreditHours,
+                FacultyId = c.FacultyId,
+                LecturerId = c.LecturerId,
+                Fee = (float)c.Fee
+            }).ToList();
             return Page();
         }
 

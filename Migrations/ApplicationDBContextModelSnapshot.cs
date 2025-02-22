@@ -289,8 +289,8 @@ namespace CanvasLMS.Migrations
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
 
-                    b.Property<float>("Fee")
-                        .HasColumnType("real");
+                    b.Property<decimal>("Fee")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<Guid>("SemesterId")
                         .HasColumnType("uniqueidentifier");
