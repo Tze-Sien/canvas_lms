@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CanvasLMS.Models;
 using CanvasLMS.Services;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace CanvasLMS.Pages.SemesterCourses
 {
@@ -49,6 +50,7 @@ namespace CanvasLMS.Pages.SemesterCourses
 
         public async Task<IActionResult> OnPostAsync()
         {
+
             if (!ModelState.IsValid)
             {
                 PopulateDropDowns();

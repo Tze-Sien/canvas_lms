@@ -24,7 +24,7 @@
             </div>
             <div class="form-group">
                 <label for="Day">Day</label>
-                <select id="Day" name="Day" class="form-control">
+                <select id="Day" asp-for="SemesterCourse.Day" class="form-control">
                     @foreach (var day in Enum.GetValues(typeof(DayOfWeek)))
                     {
                         <option value="@day">@day</option>
@@ -33,15 +33,15 @@
             </div>
             <div class="form-group">
                 <label for="StartTime">Start Time</label>
-                <input type="time" id="StartTime" name="StartTime" class="form-control" />
+                <input type="time" id="StartTime" asp-for="SemesterCourse.StartTime" class="form-control" />
             </div>
             <div class="form-group">
                 <label for="EndTime">End Time</label>
-                <input type="time" id="EndTime" name="EndTime" class="form-control" />
+                <input type="time" id="EndTime" asp-for="SemesterCourse.EndTime" class="form-control" />
             </div>
             <div class="form-group">
                 <label for="Fee">Fee</label>
-                <input type="number" id="Fee" name="Fee" class="form-control" />
+                <input asp-for="SemesterCourse.Fee" type="number" id="Fee" class="form-control" />
             </div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
