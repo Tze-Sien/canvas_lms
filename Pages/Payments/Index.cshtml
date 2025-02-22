@@ -48,9 +48,9 @@
                                 <h5 class="mb-0">Total Amount: RM @Model.TotalAmount.ToString("N2")</h5>
                             </div>
                             <div class="col text-end">
-                                <button type="button" class="btn btn-primary">
+                                <a href="@Url.Page("./PayPal", new { amount = Model.TotalAmount })" class="btn btn-primary">
                                     <i class="bi bi-credit-card"></i> Pay All Pending Fees
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
