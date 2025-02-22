@@ -19,13 +19,14 @@ namespace CanvasLMS.Pages.Payments
             _context = context;
         }
 
-        public IList<CourseEnrollment> PendingPayments { get; set; } = default!;
-        public decimal TotalAmount { get; set; }
+        public IList<CourseEnrollment> Enrollments { get; set; } = default!;
+        public decimal TotalPendingAmount { get; set; }
+        public bool HasPendingPayments => Enrollments.Any(e => e.PaymentStatus == PaymentStatus.Pending);
 
         public async Task OnGetAsync()
         {
-            // Get approved enrollments that need payment
-            PendingPayments = await _context.CourseEnrollments
+            // Get all approved enrollments
+            Enrollments = await _context.CourseEnrollments
                 .Include(ce => ce.SemesterCourse)
                     .ThenInclude(sc => sc.Course)
                 .Include(ce => ce.Student)
@@ -33,10 +34,14 @@ namespace CanvasLMS.Pages.Payments
                 .Where(ce =>
                     ce.Status == EnrollmentStatus.Enrolled &&
                     ce.Approval == AddDropApproval.Approved)
+                .OrderByDescending(ce => ce.PaidAt)
+                .ThenBy(ce => ce.SemesterCourse.Course.Name)
                 .ToListAsync();
 
-            // Calculate total amount
-            TotalAmount = PendingPayments.Sum(p => p.SemesterCourse.Fee);
+            // Calculate total pending amount
+            TotalPendingAmount = Enrollments
+                .Where(e => e.PaymentStatus == PaymentStatus.Pending)
+                .Sum(p => p.SemesterCourse.Fee);
         }
     }
 }

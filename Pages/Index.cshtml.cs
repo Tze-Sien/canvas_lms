@@ -26,6 +26,7 @@ public class IndexModel : PageModel
 
     public void OnGet()
     {
+
         var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
         var user = _context.Users.Find(userId);
 

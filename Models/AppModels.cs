@@ -147,6 +147,8 @@ namespace CanvasLMS.Models
         public Student? Student { get; set; }
         public AddDropApproval Approval { get; set; }
         public EnrollmentStatus Status { get; set; }
+        public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
+        public DateTime? PaidAt { get; set; }
     }
 
     public class StudentTranscript

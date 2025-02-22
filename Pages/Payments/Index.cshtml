@@ -1,5 +1,6 @@
 @page
 @model CanvasLMS.Pages.Payments.IndexModel
+@using CanvasLMS.Models
 
 @{
     ViewData["Title"] = "Pending Payments";
@@ -11,7 +12,7 @@
             <h2 class="h4 mb-0">Pending Course Payments</h2>
         </div>
         <div class="card-body">
-            @if (!Model.PendingPayments.Any())
+            @if (!Model.Enrollments.Any())
             {
                 <div class="alert alert-info">
                     No pending payments found.
@@ -26,17 +27,37 @@
                                 <th>Course</th>
                                 <th>Student</th>
                                 <th class="text-end">Amount (RM)</th>
-                                <th>Created Date</th>
+                                <th>Status</th>
+                                <th>Payment Date</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.PendingPayments)
+                            @foreach (var item in Model.Enrollments)
                             {
-                                <tr>
-                                    <td>@item.SemesterCourse.Course.Name</td>
-                                    <td>@item.Student.User.Name</td>
-                                    <td class="text-end">@item.SemesterCourse.Fee.ToString("N2")</td>
-                                    <td>@DateTime.UtcNow.ToString("dd/MM/yyyy")</td>
+                <tr class="@(item.PaymentStatus == PaymentStatus.Paid ? "table-success" : "")">
+                                    <td>@item.SemesterCourse?.Course?.Name</td>
+                                    <td>@item.Student?.User?.Name</td>
+                                    <td class="text-end">@item.SemesterCourse?.Fee.ToString("N2")</td>
+                                    <td>
+                                        @if (item.PaymentStatus == PaymentStatus.Paid)
+                                        {
+                                            <span class="badge bg-success">Paid</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">Pending</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.PaidAt.HasValue)
+                                        {
+                                            @item.PaidAt.Value.ToString("dd/MM/yyyy hh:mm tt")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -45,12 +66,16 @@
                     <div class="border-top mt-3 pt-3">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h5 class="mb-0">Total Amount: RM @Model.TotalAmount.ToString("N2")</h5>
+                                <h5 class="mb-0">Total Pending Amount: RM @Model.TotalPendingAmount.ToString("N2")</h5>
                             </div>
                             <div class="col text-end">
-                                <a href="@Url.Page("./PayPal", new { amount = Model.TotalAmount })" class="btn btn-primary">
-                                    <i class="bi bi-credit-card"></i> Pay All Pending Fees
-                                </a>
+                                @if (Model.HasPendingPayments)
+                                {
+                                    <a href="@Url.Page("./PayPal", new { amount = Model.TotalPendingAmount })"
+                                        class="btn btn-primary">
+                                        <i class="bi bi-credit-card"></i> Pay All Pending Fees
+                                    </a>
+                                }
                             </div>
                         </div>
                     </div>
