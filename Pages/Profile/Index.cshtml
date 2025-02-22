@@ -1,8 +1,122 @@
 @page
+@model CanvasLMS.Pages.Profile.IndexModel
 @{
     ViewData["Title"] = "Profile";
 }
 
-<h2>Profile</h2>
+<div class="container mt-4">
+    <h2>Profile Settings</h2>
 
-<p>Welcome to your profile page!</p>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Change Password</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="Password">
+                        <div class="mb-3">
+                            <label asp-for="PasswordModel.CurrentPassword" class="form-label">Current Password</label>
+                            <input asp-for="PasswordModel.CurrentPassword" class="form-control" type="password" />
+                            <span asp-validation-for="PasswordModel.CurrentPassword" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="PasswordModel.NewPassword" class="form-label">New Password</label>
+                            <input asp-for="PasswordModel.NewPassword" class="form-control" type="password" />
+                            <span asp-validation-for="PasswordModel.NewPassword" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="PasswordModel.ConfirmPassword" class="form-label">Confirm Password</label>
+                            <input asp-for="PasswordModel.ConfirmPassword" class="form-control" type="password" />
+                            <span asp-validation-for="PasswordModel.ConfirmPassword" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Profile Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="Profile">
+                        <div class="mb-3">
+                            <label asp-for="ProfileModel.Address" class="form-label">Address</label>
+                            <input asp-for="ProfileModel.Address" class="form-control" />
+                            <span asp-validation-for="ProfileModel.Address" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ProfileModel.Postcode" class="form-label">Postcode</label>
+                            <input asp-for="ProfileModel.Postcode" class="form-control" />
+                            <span asp-validation-for="ProfileModel.Postcode" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ProfileModel.City" class="form-label">City</label>
+                            <input asp-for="ProfileModel.City" class="form-control" />
+                            <span asp-validation-for="ProfileModel.City" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ProfileModel.State" class="form-label">State</label>
+                            <input asp-for="ProfileModel.State" class="form-control" />
+                            <span asp-validation-for="ProfileModel.State" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ProfileModel.Country" class="form-label">Country</label>
+                            <input asp-for="ProfileModel.Country" class="form-control" />
+                            <span asp-validation-for="ProfileModel.Country" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Bank Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="Bank">
+                        <div class="mb-3">
+                            <label asp-for="BankModel.BankAcc" class="form-label">Bank Account Number</label>
+                            <input asp-for="BankModel.BankAcc" class="form-control" />
+                            <span asp-validation-for="BankModel.BankAcc" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="BankModel.BankName" class="form-label">Bank Name</label>
+                            <input asp-for="BankModel.BankName" class="form-control" />
+                            <span asp-validation-for="BankModel.BankName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="BankModel.BankHolderName" class="form-label">Account Holder Name</label>
+                            <input asp-for="BankModel.BankHolderName" class="form-control" />
+                            <span asp-validation-for="BankModel.BankHolderName" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Bank Details</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
