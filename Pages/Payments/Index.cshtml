@@ -71,10 +71,15 @@
                             <div class="col text-end">
                                 @if (Model.HasPendingPayments)
                                 {
-                                    <a href="@Url.Page("./PayPal", new { amount = Model.TotalPendingAmount })"
-                                        class="btn btn-primary">
-                                        <i class="bi bi-credit-card"></i> Pay All Pending Fees
-                                    </a>
+                                    <div class="btn-group">
+                                        <a href="@Url.Page("/Invoice/Index")" class="btn btn-outline-primary">
+                                            <i class="bi bi-receipt"></i> View Invoice
+                                        </a>
+                                        <a href="@Url.Page("./PayPal", new { amount = Model.TotalPendingAmount })"
+                                            class="btn btn-primary">
+                                            <i class="bi bi-credit-card"></i> Pay All Pending Fees
+                                        </a>
+                                    </div>
                                 }
                             </div>
                         </div>
