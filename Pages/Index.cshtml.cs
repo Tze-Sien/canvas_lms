@@ -11,11 +11,11 @@ namespace CanvasLMS.Pages;
 [Authorize]
 public class IndexModel : PageModel
 {
-    public required List<(string title, string url, string ImageUrl)> NavigationLinks { get; set; }
+    public List<(string title, string url, string ImageUrl)> NavigationLinks { get; set; } = new();
     public bool IsStudent { get; private set; }
     public bool IsLecturer { get; private set; }
     public bool IsAdmin { get; private set; }
-    public required string UserName { get; set; }
+    public string UserName { get; set; } = string.Empty;
 
     private readonly ApplicationDBContext _context;
 
