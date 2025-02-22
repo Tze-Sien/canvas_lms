@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 
 namespace CanvasLMS.Pages;
 
@@ -12,6 +13,7 @@ public class IndexModel : PageModel
 {
     public required List<(string title, string url, string ImageUrl)> NavigationLinks { get; set; }
     public bool IsStudent { get; private set; }
+    public bool IsLecturer { get; private set; }
     public required string UserName { get; set; }
 
     private readonly ApplicationDBContext _context;
@@ -28,11 +30,15 @@ public class IndexModel : PageModel
 
         if (user == null)
         {
-            throw new InvalidOperationException("User not found");
+            // Sign out the user if not found in database
+            HttpContext.SignOutAsync("CookieAuth").Wait();
+            Response.Redirect("/Logout");
+            return;
         }
 
         UserName = user.Name;
         IsStudent = user.Role == Role.Student;
+        IsLecturer = user.Role == Role.Lecturer;
 
         if (IsStudent)
         {
@@ -45,6 +51,13 @@ public class IndexModel : PageModel
                 ("Student Statement", "/StudentStatement/Index", "https://via.placeholder.com/100"),
                 ("Class Timetable", "/RegistrationSummary/Index", "https://via.placeholder.com/100"),
                 ("Manage Payments", "/Payments/Index", "https://via.placeholder.com/100")
+            };
+        }
+        else if (IsLecturer)
+        {
+            NavigationLinks = new List<(string title, string url, string ImageUrl)>
+            {
+                ("Course Reviews", "/Lecturers/CourseReviews/Index", "https://via.placeholder.com/100"),
             };
         }
         else

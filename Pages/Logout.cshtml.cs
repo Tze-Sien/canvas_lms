@@ -14,5 +14,14 @@ namespace CanvasLMS.Pages
             // Redirect to the home page or login page
             return RedirectToPage("/Index");
         }
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            // Sign out the user and remove the authentication cookie
+            await HttpContext.SignOutAsync("CookieAuth");
+
+            // Redirect to the home page or login page
+            return RedirectToPage("/Login/Index");
+        }
     }
 }
