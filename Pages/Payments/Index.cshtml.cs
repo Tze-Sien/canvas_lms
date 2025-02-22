@@ -20,6 +20,7 @@ namespace CanvasLMS.Pages.Payments
         }
 
         public IList<CourseEnrollment> PendingPayments { get; set; } = default!;
+        public decimal TotalAmount { get; set; }
 
         public async Task OnGetAsync()
         {
@@ -33,6 +34,9 @@ namespace CanvasLMS.Pages.Payments
                     ce.Status == EnrollmentStatus.Enrolled &&
                     ce.Approval == AddDropApproval.Approved)
                 .ToListAsync();
+
+            // Calculate total amount
+            TotalAmount = PendingPayments.Sum(p => p.SemesterCourse.Fee);
         }
     }
 }
