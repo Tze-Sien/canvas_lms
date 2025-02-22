@@ -4,6 +4,7 @@ using CanvasLMS.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CanvasLMS.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250222043619_changetype4")]
+    partial class changetype4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,8 +83,8 @@ namespace CanvasLMS.Migrations
                     b.Property<Guid>("FacultyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Fee")
-                        .HasColumnType("int");
+                    b.Property<float>("Fee")
+                        .HasColumnType("real");
 
                     b.Property<Guid?>("LecturerId")
                         .HasColumnType("uniqueidentifier");
@@ -289,8 +292,8 @@ namespace CanvasLMS.Migrations
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
 
-                    b.Property<int>("Fee")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Fee")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<Guid>("SemesterId")
                         .HasColumnType("uniqueidentifier");

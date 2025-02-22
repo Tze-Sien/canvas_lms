@@ -84,7 +84,7 @@ namespace CanvasLMS.Services
             //     .HasColumnType("float"); // Ensure SQL Server uses FLOAT instead of DECIMAL
             modelBuilder.Entity<SemesterCourse>()
                 .Property(e => e.Fee)
-                .HasColumnType("decimal(18, 2)");
+                .HasColumnType("int");
         }
     }
 }

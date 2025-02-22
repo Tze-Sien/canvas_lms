@@ -30,7 +30,7 @@ namespace CanvasLMS.Pages.SemesterCourses
                 CreditHours = c.CreditHours,
                 FacultyId = c.FacultyId,
                 LecturerId = c.LecturerId,
-                Fee = (float)c.Fee
+                Fee = c.Fee
             }).ToList();
             return Page();
         }

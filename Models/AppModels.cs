@@ -55,7 +55,7 @@ namespace CanvasLMS.Models
         public Guid? LecturerId { get; set; }
         public Lecturer? Lecturer { get; set; }
 
-        public float Fee { get; set; }
+        public int Fee { get; set; }
     }
 
     public class Student
@@ -120,7 +120,7 @@ namespace CanvasLMS.Models
         [Required]
         public TimeSpan EndTime { get; set; }
 
-        public float Fee { get; set; }
+        public int Fee { get; set; }
     }
 
     public class SemesterStudent
