@@ -167,6 +167,7 @@ namespace CanvasLMS.Pages.CourseEnrollments.AddDrop
             _context.AddDropHistories.Add(history);
             await _context.SaveChangesAsync();
 
+
             SuccessMessage = "Course enrollment pending approval.";
             return RedirectToPage();
         }

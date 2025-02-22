@@ -19,7 +19,6 @@ namespace CanvasLMS.Services
         public DbSet<CourseEnrollment> CourseEnrollments { get; set; }
         public DbSet<StudentTranscript> StudentTranscripts { get; set; }
         public DbSet<CourseReview> CourseReviews { get; set; }
-        public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<AddDropHistory> AddDropHistories { get; set; }
 

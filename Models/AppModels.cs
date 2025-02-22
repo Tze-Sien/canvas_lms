@@ -178,19 +178,6 @@ namespace CanvasLMS.Models
         public DateTime CreatedAt { get; set; }
     }
 
-    public class Invoice
-    {
-        [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
-        [ForeignKey("CourseEnrollment")]
-        public Guid CourseEnrollmentId { get; set; }
-        public required CourseEnrollment CourseEnrollment { get; set; }
-        public string? PaymentId { get; set; }
-        public int Amount { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public InvoiceStatus Status { get; set; }
-    }
-
     public class Payment
     {
         [Key]

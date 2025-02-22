@@ -2,53 +2,73 @@
 @model CanvasLMS.Pages.Payments.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Pending Payments";
 }
 
-<h1>Index</h1>
+<div class="container my-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0">Pending Course Payments</h2>
+        </div>
+        <div class="card-body">
+            @if (!Model.PendingPayments.Any())
+            {
+                <div class="alert alert-info">
+                    No pending payments found.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Course</th>
+                                <th>Student</th>
+                                <th>Amount (RM)</th>
+                                <th>Created Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.PendingPayments)
+                            {
+                                <tr>
+                                    <td>@item.SemesterCourse.Course.Name</td>
+                                    <td>@item.Student.User.Name</td>
+                                    <td>@item.SemesterCourse.Fee.ToString("N2")</td>
+                                    <td>@DateTime.UtcNow.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="#" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-credit-card"></i> Pay Now
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Payment[0].User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Payment[0].Amount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Payment[0].Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Payment[0].CreatedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Payment) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Amount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
+
+        .card {
+            border-radius: 0.5rem;
+        }
+
+        .card-header {
+            border-radius: calc(0.5rem - 1px) calc(0.5rem - 1px) 0 0 !important;
+        }
+    </style>
 }
-    </tbody>
-</table>

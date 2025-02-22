@@ -1,4 +1,4 @@
-namespace CanvasLMS.Models 
+namespace CanvasLMS.Models
 {
     public enum DayOfWeek
     {
@@ -11,7 +11,7 @@ namespace CanvasLMS.Models
         Sunday
     }
 
-     public enum Role
+    public enum Role
     {
         Student,
         Lecturer,
@@ -44,13 +44,6 @@ namespace CanvasLMS.Models
         Paid,
         Pending,
         Failed
-    }
-
-    public enum InvoiceStatus
-    {
-        Paid,
-        Pending,
-        Void
     }
 
     public enum SemesterStatus
