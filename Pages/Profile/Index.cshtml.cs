@@ -29,14 +29,18 @@ namespace CanvasLMS.Pages.Profile
         public BankDetailsModel BankModel { get; set; } = new();
 
         private async Task LoadUserData()
-        {   
+        {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty);
             var student = await _context.Students
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.UserId == userId);
 
+
+
             if (student != null)
             {
+
+
                 ProfileModel = new ProfileUpdateModel
                 {
                     Address = student.Address ?? "",
@@ -106,16 +110,14 @@ namespace CanvasLMS.Pages.Profile
 
         public async Task<IActionResult> OnPostProfileAsync()
         {
-            Console.WriteLine("Hello World");   
-            Console.WriteLine(ModelState.IsValid);    
-            if (!ModelState.IsValid)
-            {
-                await LoadUserData();
-                return Page();
-            }
+
+            Console.WriteLine("qq");
+            Console.WriteLine(ModelState);
+
+
 
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty);
-            
+
             Console.WriteLine("Helo World");
             var student = await _context.Students
                 .Include(s => s.User)
@@ -178,11 +180,7 @@ namespace CanvasLMS.Pages.Profile
 
         public async Task<IActionResult> OnPostBankAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                await LoadUserData();
-                return Page();
-            }
+
 
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty);
             var student = await _context.Students
