@@ -14,6 +14,7 @@ public class IndexModel : PageModel
     public required List<(string title, string url, string ImageUrl)> NavigationLinks { get; set; }
     public bool IsStudent { get; private set; }
     public bool IsLecturer { get; private set; }
+    public bool IsAdmin { get; private set; }
     public required string UserName { get; set; }
 
     private readonly ApplicationDBContext _context;
@@ -39,6 +40,7 @@ public class IndexModel : PageModel
         UserName = user.Name;
         IsStudent = user.Role == Role.Student;
         IsLecturer = user.Role == Role.Lecturer;
+        IsAdmin = user.Role == Role.Admin;
 
         if (IsStudent)
         {
@@ -60,15 +62,17 @@ public class IndexModel : PageModel
                 ("Course Reviews", "/Lecturers/CourseReviews/Index", "https://via.placeholder.com/100"),
             };
         }
-        else
+        else if (IsAdmin)
         {
             NavigationLinks = new List<(string title, string url, string ImageUrl)>
             {
+                ("Add/Drop Request", "/CourseEnrollments/AddDrop/Manage/Index", "https://via.placeholder.com/100"),
                 ("Manage Users", "/Users/Index", "https://via.placeholder.com/100"),
                 ("Manage Faculties", "/Faculties/Create", "https://via.placeholder.com/100"),
                 ("Manage Semesters", "/Semesters/Create", "https://via.placeholder.com/100"),
                 ("Manage Payments", "/Payments/Create", "https://via.placeholder.com/100"),
-                ("Manage Courses", "/SemesterCourses/Create", "https://via.placeholder.com/100")
+                ("Manage Courses", "/Courses/Create", "https://via.placeholder.com/100"),
+                ("Manage Semester Courses", "/SemesterCourses/Create", "https://via.placeholder.com/100")
             };
         }
     }
