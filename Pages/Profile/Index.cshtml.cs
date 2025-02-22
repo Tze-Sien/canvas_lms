@@ -82,27 +82,27 @@ namespace CanvasLMS.Pages.Profile
                 return RedirectToPage();
             }
 
-            if (user.Password != PasswordModel.CurrentPassword)
+            // Verify current password using BCrypt
+            if (!BCrypt.Net.BCrypt.Verify(PasswordModel.CurrentPassword, user.Password))
             {
                 ModelState.AddModelError("PasswordModel.CurrentPassword", "Current password is incorrect.");
                 await LoadUserData();
                 return Page();
             }
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                user.Password = PasswordModel.NewPassword;
+                // Hash the new password using BCrypt
+                user.Password = BCrypt.Net.BCrypt.HashPassword(PasswordModel.NewPassword);
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
 
                 TempData["SuccessMessage"] = "Password updated successfully.";
                 return RedirectToPage();
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
+                Console.WriteLine($"Password update error: {ex.Message}");
                 TempData["ErrorMessage"] = "Failed to update password. Please try again.";
                 return RedirectToPage();
             }
